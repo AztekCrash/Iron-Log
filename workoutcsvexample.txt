@@ -1,0 +1,44 @@
+Program,Day,Type,Exercise,Sets,Reps,Rest,Notes,Suggested Weight
+StrongLifts 5x5,Monday,Workout A,Barbell Squat,5,5,180,Add 5lbs each session,45
+StrongLifts 5x5,Monday,Workout A,Barbell Bench Press,5,5,180,Keep heels on floor,45
+StrongLifts 5x5,Monday,Workout A,Barbell Row,5,5,180,Pull to lower chest,45
+StrongLifts 5x5,Wednesday,Workout B,Barbell Squat,5,5,180,Add 5lbs each session,50
+StrongLifts 5x5,Wednesday,Workout B,Overhead Press,5,5,180,Strict form; no leg drive,45
+StrongLifts 5x5,Wednesday,Workout B,Deadlift,1,5,180,Add 10lbs each session,95
+StrongLifts 5x5,Friday,Workout A,Barbell Squat,5,5,180,Add 5lbs each session,55
+StrongLifts 5x5,Friday,Workout A,Barbell Bench Press,5,5,180,,50
+StrongLifts 5x5,Friday,Workout A,Barbell Row,5,5,180,,50
+3-Day Full Body,Monday,Full Body,Goblet Squats,3,10-12,90,Focus on depth,25
+3-Day Full Body,Monday,Full Body,Push-ups,3,AMRAP,60,As many reps as possible,
+3-Day Full Body,Monday,Full Body,Dumbbell Rows,3,10-12,60,,20
+3-Day Full Body,Wednesday,Full Body,Dumbbell Lunges,3,10,90,Reps per leg,15
+3-Day Full Body,Wednesday,Full Body,Dumbbell Shoulder Press,3,10-12,60,,20
+3-Day Full Body,Wednesday,Full Body,Lat Pulldowns,3,10-12,90,,70
+3-Day Full Body,Friday,Full Body,Romanian Deadlifts,3,12,90,Keep back flat,45
+3-Day Full Body,Friday,Full Body,Dumbbell Bench Press,3,10-12,90,,30
+3-Day Full Body,Friday,Full Body,Plank,3,45s,60,Focus on core tension,
+Upper/Lower Split,Monday,Upper Split,Bench Press,3,8-10,120,,95
+Upper/Lower Split,Monday,Upper Split,Seated Cable Row,3,10-12,90,,80
+Upper/Lower Split,Monday,Upper Split,Dumbbell Lateral Raise,3,12-15,60,,10
+Upper/Lower Split,Tuesday,Lower Split,Back Squat,3,8-10,120,,135
+Upper/Lower Split,Tuesday,Lower Split,Leg Curls,3,12-15,90,,60
+Upper/Lower Split,Tuesday,Lower Split,Calf Raises,4,15,60,,
+Upper/Lower Split,Thursday,Upper Split,Overhead Press,3,8-10,120,,65
+Upper/Lower Split,Thursday,Upper Split,Pull Ups,3,6-10,120,Assisted if needed,
+Upper/Lower Split,Thursday,Upper Split,Triceps Pushdown,3,12-15,60,,40
+Upper/Lower Split,Friday,Lower Split,Deadlift,3,5,180,,185
+Upper/Lower Split,Friday,Lower Split,Leg Press,3,10-12,90,,180
+Bodyweight Mastery,Monday,Calisthenics,Pull-ups,4,5-10,120,Use bands if needed,
+Bodyweight Mastery,Monday,Calisthenics,Dips,4,8-12,90,Focus on triceps,
+Bodyweight Mastery,Monday,Calisthenics,Bodyweight Squats,4,20,60,Fast tempo,
+Bodyweight Mastery,Wednesday,Calisthenics,Plank to Pushup,3,10,60,,
+Bodyweight Mastery,Wednesday,Calisthenics,Hollow Body Hold,3,30s,60,,
+Bodyweight Mastery,Wednesday,Calisthenics,Bird-Dog,3,12,30,Reps per side,
+Bodyweight Mastery,Friday,Calisthenics,Chin-ups,4,5-10,120,,
+Bodyweight Mastery,Friday,Calisthenics,Diamond Push-ups,4,10-15,90,,
+Bodyweight Mastery,Friday,Calisthenics,Bulgarian Split Squats,3,10,60,Reps per leg,
+30-Min Express,Any,Express Circuit,Kettlebell Swings,4,20,30,Minimal rest between moves,35
+30-Min Express,Any,Express Circuit,Dumbbell Thrusters,4,12,30,Squat into overhead press,20
+30-Min Express,Any,Express Circuit,Mountain Climbers,4,40,30,Fast pace,
+30-Min Express,Any,Express Circuit,Renegade Rows,4,10,30,Reps per arm,25
+30-Min Express,Any,Express Circuit,Burpees,4,10,60,Rest 60s after full round,
