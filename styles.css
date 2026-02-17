@@ -199,6 +199,32 @@
             flex: 1;
         }
 
+        .toast {
+            position: fixed;
+            left: 50%;
+            bottom: 24px;
+            transform: translateX(-50%) translateY(20px);
+            background: rgba(16, 24, 36, 0.95);
+            color: var(--text-primary);
+            border: 1px solid var(--border);
+            border-left: 4px solid var(--accent-secondary);
+            border-radius: 10px;
+            padding: 12px 16px;
+            font-size: 0.9rem;
+            max-width: min(520px, calc(100% - 32px));
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.35);
+            opacity: 0;
+            transition: opacity 0.2s ease, transform 0.2s ease;
+            z-index: 999;
+            pointer-events: none;
+            text-align: center;
+        }
+
+        .toast-visible {
+            opacity: 1;
+            transform: translateX(-50%) translateY(0);
+        }
+
         .exercise-meta {
             font-size: 0.85rem;
             color: var(--text-secondary);
@@ -245,6 +271,17 @@
             font-size: 0.8rem;
             color: var(--accent-secondary);
             margin-top: 5px;
+        }
+
+        .exercise-demo-btn {
+            margin-top: 10px;
+            margin-bottom: 12px;
+            width: auto;
+            display: inline-block;
+            padding: 8px 12px;
+            font-size: 0.9rem;
+            letter-spacing: 1px;
+            box-shadow: none;
         }
 
         input[type="file"] {
@@ -424,6 +461,10 @@
             padding: 20px;
         }
 
+        .demo-modal-content {
+            max-width: 560px;
+        }
+
         .modal-text {
             color: var(--text-secondary);
             font-size: 0.9rem;
@@ -431,10 +472,36 @@
             margin: 12px 0 18px;
         }
 
+        .demo-modal-body {
+            margin-top: 0;
+        }
+
+        .demo-media-wrap {
+            border: 1px solid var(--border);
+            border-radius: 10px;
+            overflow: hidden;
+            margin-top: 10px;
+            background: #000;
+        }
+
+        .demo-media {
+            width: 100%;
+            max-height: 62vh;
+            object-fit: contain;
+            display: block;
+        }
+
         .modal-actions {
             display: grid;
             grid-template-columns: 1fr 1fr;
             gap: 10px;
+        }
+
+        .modal-actions .btn {
+            margin-bottom: 0;
+            text-align: center;
+            text-decoration: none;
+            display: block;
         }
 
         @keyframes fadeIn {

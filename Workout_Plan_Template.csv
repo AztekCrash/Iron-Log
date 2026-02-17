@@ -1,12 +1,12 @@
-Day,Type,Exercise,Sets,Reps,Rest,Notes,Suggested Weight
-Monday,Upper Push,Barbell Bench Press,3,8-10,120,Controlled tempo,135
-Monday,Upper Push,Incline Dumbbell Press,3,10-12,90,,50
-Monday,Upper Push,Shoulder Press,3,8-10,90,,95
-Monday,Upper Push,Triceps Pushdown,3,12-15,60,,
-Tuesday,Lower Body A,Back Squat,3,6-8,150,,185
-Tuesday,Lower Body A,Romanian Deadlift,3,8-10,120,,135
-Tuesday,Lower Body A,Leg Press,3,10-12,90,,
-Thursday,Upper Pull,Pull Ups,3,6-10,120,Add weight if needed,
-Thursday,Upper Pull,Barbell Row,3,8-10,120,,135
-Saturday,Lower Body B,Deadlift,3,5,180,,225
-Saturday,Lower Body B,Leg Curl,3,10-12,90,,
+Day,Type,Exercise,Sets,Reps,Rest,Notes,Suggested Weight,Demo Type,Demo URL,Demo Poster
+Monday,Upper Push,Barbell Bench Press,3,8-10,120,Controlled tempo,135,link,https://www.youtube.com/results?search_query=barbell+bench+press+exercise+form,
+Monday,Upper Push,Incline Dumbbell Press,3,10-12,90,,50,link,https://www.youtube.com/results?search_query=incline+dumbbell+press+exercise+form,
+Monday,Upper Push,Shoulder Press,3,8-10,90,,95,link,https://www.youtube.com/results?search_query=shoulder+press+exercise+form,
+Monday,Upper Push,Triceps Pushdown,3,12-15,60,,,link,https://www.youtube.com/results?search_query=triceps+pushdown+exercise+form,
+Tuesday,Lower Body A,Back Squat,3,6-8,150,,185,link,https://www.youtube.com/results?search_query=back+squat+exercise+form,
+Tuesday,Lower Body A,Romanian Deadlift,3,8-10,120,,135,link,https://www.youtube.com/results?search_query=romanian+deadlift+exercise+form,
+Tuesday,Lower Body A,Leg Press,3,10-12,90,,,link,https://www.youtube.com/results?search_query=leg+press+exercise+form,
+Thursday,Upper Pull,Pull Ups,3,6-10,120,Add weight if needed,,link,https://www.youtube.com/results?search_query=pull+ups+exercise+form,
+Thursday,Upper Pull,Barbell Row,3,8-10,120,,135,link,https://www.youtube.com/results?search_query=barbell+row+exercise+form,
+Saturday,Lower Body B,Deadlift,3,5,180,,225,link,https://www.youtube.com/results?search_query=deadlift+exercise+form,
+Saturday,Lower Body B,Leg Curl,3,10-12,90,,,link,https://www.youtube.com/results?search_query=leg+curl+exercise+form,

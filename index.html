@@ -125,7 +125,19 @@
                 </div>
             </div>
         </div>
+
+        <div id="exerciseDemoModal" class="modal hidden">
+            <div class="modal-content demo-modal-content">
+                <div class="section-title" id="exerciseDemoTitle">Exercise Demo</div>
+                <div id="exerciseDemoBody" class="modal-text demo-modal-body"></div>
+                <div class="modal-actions">
+                    <a class="btn btn-secondary hidden" id="exerciseDemoSourceLink" target="_blank" rel="noopener noreferrer">Open Source</a>
+                    <button class="btn" id="closeExerciseDemoBtn">Close</button>
+                </div>
+            </div>
+        </div>
     </div>
+    <div id="toast" class="toast hidden" role="status" aria-live="polite"></div>
 
     <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
     <script>
@@ -138,6 +150,11 @@
         let timerRunning = [];
         let builtInPrograms = [];
         let selectedProgram = null;
+        let selectedExerciseDemo = null;
+        let timerEndAt = [];
+        let audioContext = null;
+        let inactivityTimeout = null;
+        const INACTIVITY_COMPLETE_MS = 25 * 60 * 1000;
         const PROGRAMS_CSV = `Program,Day,Type,Exercise,Sets,Reps,Rest,Notes,Suggested Weight
 StrongLifts 5x5,Monday,Workout A,Barbell Squat,5,5,180,Add 5lbs each session,45
 StrongLifts 5x5,Monday,Workout A,Barbell Bench Press,5,5,180,Keep heels on floor,45
@@ -190,6 +207,9 @@ Bodyweight Mastery,Friday,Calisthenics,Bulgarian Split Squats,3,10,60,Reps per l
             bindEventHandlers();
             updateStats();
             updatePlanHint();
+            if (currentWorkout) {
+                showActiveWorkout();
+            }
             if (workoutPlan) {
                 console.log('Workout plan loaded');
             }
@@ -209,8 +229,25 @@ Bodyweight Mastery,Friday,Calisthenics,Bulgarian Split Squats,3,10,60,Reps per l
             document.getElementById('fileInput').addEventListener('change', handleFileUpload);
             document.getElementById('cancelProgramBtn').addEventListener('click', closeProgramModal);
             document.getElementById('confirmProgramBtn').addEventListener('click', confirmProgramLoad);
+            document.getElementById('closeExerciseDemoBtn').addEventListener('click', closeExerciseDemo);
+            document.getElementById('exerciseDemoModal').addEventListener('click', (event) => {
+                if (event.target.id === 'exerciseDemoModal') closeExerciseDemo();
+            });
 
             document.getElementById('exercisesList').addEventListener('click', (event) => {
+                ensureAudioContext();
+                const demo = event.target.closest('.exercise-demo-btn');
+                if (demo) {
+                    const exIndex = parseInt(demo.dataset.exIndex, 10);
+                    const exercise = currentWorkout.exercises[exIndex];
+                    const opened = openExerciseDemo(exercise);
+                    if (!opened) {
+                        window.open(getYouTubeSearchUrl((exercise && exercise.name) || 'exercise'), '_blank', 'noopener,noreferrer');
+                    }
+                    recordActivity();
+                    return;
+                }
+
                 const quick = event.target.closest('.quick-timer-btn');
                 if (quick) {
                     const exIndex = parseInt(quick.dataset.exIndex, 10);
@@ -241,6 +278,23 @@ Bodyweight Mastery,Friday,Calisthenics,Bulgarian Split Squats,3,10,60,Reps per l
                 if (!program) return;
                 openProgramModal(program);
             });
+
+            document.addEventListener('touchstart', ensureAudioContext, { passive: true, once: true });
+            document.addEventListener('click', ensureAudioContext, { once: true });
+
+            document.addEventListener('visibilitychange', () => {
+                if (document.visibilityState === 'hidden') {
+                    saveCurrentWorkout();
+                    return;
+                }
+                resumeRunningTimers();
+            });
+
+            window.addEventListener('pagehide', saveCurrentWorkout);
+
+            ['click', 'touchstart', 'keydown', 'input'].forEach((eventName) => {
+                document.addEventListener(eventName, recordActivity, { passive: true });
+            });
         }
 
         // Storage functions
@@ -255,6 +309,39 @@ Bodyweight Mastery,Friday,Calisthenics,Bulgarian Split Squats,3,10,60,Reps per l
             
             if (planData) workoutPlan = normalizePlan(JSON.parse(planData));
             if (historyData) workoutHistory = JSON.parse(historyData);
+            loadCurrentWorkout();
+        }
+
+        function saveCurrentWorkout() {
+            if (!currentWorkout) {
+                localStorage.removeItem('currentWorkout');
+                localStorage.removeItem('timerState');
+                return;
+            }
+            localStorage.setItem('currentWorkout', JSON.stringify(currentWorkout));
+            localStorage.setItem('timerState', JSON.stringify({
+                seconds: timerSeconds,
+                running: timerRunning,
+                endAt: timerEndAt
+            }));
+        }
+
+        function loadCurrentWorkout() {
+            const workoutData = localStorage.getItem('currentWorkout');
+            if (workoutData) {
+                currentWorkout = JSON.parse(workoutData);
+            }
+            const timerState = localStorage.getItem('timerState');
+            if (timerState) {
+                try {
+                    const parsed = JSON.parse(timerState);
+                    timerSeconds = Array.isArray(parsed.seconds) ? parsed.seconds : [];
+                    timerRunning = Array.isArray(parsed.running) ? parsed.running : [];
+                    timerEndAt = Array.isArray(parsed.endAt) ? parsed.endAt : [];
+                } catch (error) {
+                    console.warn('Timer state load failed', error);
+                }
+            }
         }
 
         function getPlanName() {
@@ -286,10 +373,41 @@ Bodyweight Mastery,Friday,Calisthenics,Bulgarian Split Squats,3,10,60,Reps per l
         const MAX_NOTES_LENGTH = 200;
         const MAX_WEIGHT_LENGTH = 20;
         const MAX_REPS_LENGTH = 20;
+        const MAX_URL_LENGTH = 500;
+        const MAX_DEMO_TYPE_LENGTH = 20;
         const MIN_SETS = 1;
         const MAX_SETS = 20;
         const MIN_REST = 0;
         const MAX_REST = 600;
+        const DEFAULT_DEMO_TYPE = 'youtube';
+        const DEMO_QUERY_OVERRIDES = {
+            'barbell squat': 'barbell back squat proper form',
+            'back squat': 'barbell back squat proper form',
+            'bench press': 'barbell bench press proper form',
+            'barbell bench press': 'barbell bench press proper form',
+            'overhead press': 'barbell overhead press proper form',
+            'shoulder press': 'dumbbell shoulder press proper form',
+            'barbell row': 'barbell bent over row proper form',
+            'dumbbell row': 'one arm dumbbell row proper form',
+            'dumbbell rows': 'one arm dumbbell row proper form',
+            'deadlift': 'conventional deadlift proper form',
+            'romanian deadlift': 'romanian deadlift proper form',
+            'leg press': 'leg press proper form',
+            'pull ups': 'strict pull up proper form',
+            'pull-ups': 'strict pull up proper form',
+            'chin ups': 'chin up proper form',
+            'chin-ups': 'chin up proper form',
+            'push ups': 'push up proper form',
+            'push-ups': 'push up proper form',
+            'dips': 'parallel bar dips proper form',
+            'lat pulldowns': 'lat pulldown proper form',
+            'triceps pushdown': 'triceps cable pushdown proper form',
+            'bulgarian split squats': 'bulgarian split squat proper form',
+            'goblet squats': 'goblet squat proper form',
+            'kettlebell swings': 'kettlebell swing proper form',
+            'mountain climbers': 'mountain climber exercise form',
+            'burpees': 'burpee proper form'
+        };
 
         function clampNumber(value, min, max, fallback) {
             const parsed = Number.parseInt(value, 10);
@@ -302,6 +420,46 @@ Bodyweight Mastery,Friday,Calisthenics,Bulgarian Split Squats,3,10,60,Reps per l
             return String(value).trim().slice(0, maxLength);
         }
 
+        function normalizeExerciseKey(name) {
+            return normalizeText(name, MAX_NAME_LENGTH)
+                .toLowerCase()
+                .replace(/[^a-z0-9\s-]/g, '')
+                .replace(/\s+/g, ' ')
+                .trim();
+        }
+
+        function getDemoSearchQuery(exerciseName) {
+            const key = normalizeExerciseKey(exerciseName);
+            return DEMO_QUERY_OVERRIDES[key] || `${normalizeText(exerciseName, MAX_NAME_LENGTH)} exercise form`;
+        }
+
+        function getYouTubeSearchUrl(exerciseName) {
+            const query = encodeURIComponent(getDemoSearchQuery(exerciseName));
+            return `https://www.youtube.com/results?search_query=${query}`;
+        }
+
+        function resolveDemoFields(exerciseName, rawType, rawUrl, rawPoster) {
+            const demoPoster = normalizeText(rawPoster, MAX_URL_LENGTH);
+            const explicitType = normalizeText(rawType, MAX_DEMO_TYPE_LENGTH).toLowerCase();
+            const explicitUrl = normalizeText(rawUrl, MAX_URL_LENGTH);
+
+            if (explicitUrl) {
+                const detectedType = inferDemoType(explicitType, explicitUrl);
+                const normalizedUrl = normalizeDemoUrl(detectedType || explicitType, explicitUrl, exerciseName);
+                return {
+                    demoType: detectedType || explicitType || 'link',
+                    demoUrl: normalizedUrl,
+                    demoPoster
+                };
+            }
+
+            return {
+                demoType: DEFAULT_DEMO_TYPE,
+                demoUrl: getYouTubeSearchUrl(exerciseName),
+                demoPoster: ''
+            };
+        }
+
         function normalizePlan(rawPlan) {
             const safePlan = Object.create(null);
             if (!rawPlan || typeof rawPlan !== 'object') return safePlan;
@@ -309,14 +467,27 @@ Bodyweight Mastery,Friday,Calisthenics,Bulgarian Split Squats,3,10,60,Reps per l
             Object.keys(rawPlan).forEach((key) => {
                 if (blockedKeys.has(key)) return;
                 const exercises = Array.isArray(rawPlan[key]) ? rawPlan[key] : [];
-                safePlan[key] = exercises.map((ex) => ({
-                    name: normalizeText(ex && ex.name, MAX_NAME_LENGTH),
+                safePlan[key] = exercises.map((ex) => {
+                    const name = normalizeText(ex && ex.name, MAX_NAME_LENGTH);
+                    const resolvedDemo = resolveDemoFields(
+                        name,
+                        ex && ex.demoType,
+                        ex && ex.demoUrl,
+                        ex && ex.demoPoster
+                    );
+
+                    return {
+                    name,
                     sets: clampNumber(ex && ex.sets, MIN_SETS, MAX_SETS, 3),
                     reps: normalizeText(ex && ex.reps, MAX_REPS_LENGTH) || '10-12',
                     rest: clampNumber(ex && ex.rest, MIN_REST, MAX_REST, 60),
                     notes: normalizeText(ex && ex.notes, MAX_NOTES_LENGTH),
-                    suggestedWeight: normalizeText(ex && ex.suggestedWeight, MAX_WEIGHT_LENGTH)
-                }));
+                    suggestedWeight: normalizeText(ex && ex.suggestedWeight, MAX_WEIGHT_LENGTH),
+                    demoType: resolvedDemo.demoType,
+                    demoUrl: resolvedDemo.demoUrl,
+                    demoPoster: resolvedDemo.demoPoster
+                };
+                });
             });
 
             return safePlan;
@@ -388,13 +559,23 @@ Bodyweight Mastery,Friday,Calisthenics,Bulgarian Split Squats,3,10,60,Reps per l
                     }
 
                     if (currentDay && exerciseValue) {
+                        const resolvedDemo = resolveDemoFields(
+                            exerciseValue,
+                            row[headerMap.demoType],
+                            row[headerMap.demoUrl],
+                            row[headerMap.demoPoster]
+                        );
+
                         workoutPlan[currentDay].push({
                             name: exerciseValue,
                             sets: clampNumber(row[headerMap.sets], MIN_SETS, MAX_SETS, 3),
                             reps: normalizeText(row[headerMap.reps], MAX_REPS_LENGTH) || '10-12',
                             rest: clampNumber(row[headerMap.rest], MIN_REST, MAX_REST, 60),
                             notes: normalizeText(row[headerMap.notes], MAX_NOTES_LENGTH),
-                            suggestedWeight: normalizeText(row[headerMap.suggestedWeight], MAX_WEIGHT_LENGTH)
+                            suggestedWeight: normalizeText(row[headerMap.suggestedWeight], MAX_WEIGHT_LENGTH),
+                            demoType: resolvedDemo.demoType,
+                            demoUrl: resolvedDemo.demoUrl,
+                            demoPoster: resolvedDemo.demoPoster
                         });
                     }
                 }
@@ -418,13 +599,18 @@ Bodyweight Mastery,Friday,Calisthenics,Bulgarian Split Squats,3,10,60,Reps per l
                         }
                         workoutPlan[currentDay] = [];
                     } else if (currentDay && colB) {
+                        const fallbackExerciseName = normalizeText(colB, MAX_NAME_LENGTH);
+                        const resolvedDemo = resolveDemoFields(fallbackExerciseName, '', '', '');
                         workoutPlan[currentDay].push({
-                            name: normalizeText(colB, MAX_NAME_LENGTH),
+                            name: fallbackExerciseName,
                             sets: clampNumber(row[2], MIN_SETS, MAX_SETS, 3),
                             reps: normalizeText(row[3], MAX_REPS_LENGTH) || '10-12',
                             rest: clampNumber(row[4], MIN_REST, MAX_REST, 60),
                             notes: normalizeText(row[5], MAX_NOTES_LENGTH),
-                            suggestedWeight: normalizeText(row[6], MAX_WEIGHT_LENGTH)
+                            suggestedWeight: normalizeText(row[6], MAX_WEIGHT_LENGTH),
+                            demoType: resolvedDemo.demoType,
+                            demoUrl: resolvedDemo.demoUrl,
+                            demoPoster: resolvedDemo.demoPoster
                         });
                     }
                 }
@@ -454,27 +640,36 @@ Bodyweight Mastery,Friday,Calisthenics,Bulgarian Split Squats,3,10,60,Reps per l
                 reps: indexOfAny(['reps', 'rep']),
                 rest: indexOfAny(['rest', 'rest (sec)', 'rest seconds']),
                 notes: indexOfAny(['notes', 'note']),
-                suggestedWeight: indexOfAny(['suggested weight', 'suggested', 'weight'])
+                suggestedWeight: indexOfAny(['suggested weight', 'suggested', 'weight']),
+                demoType: indexOfAny(['demo type', 'media type', 'visual type']),
+                demoUrl: indexOfAny(['demo url', 'media url', 'visual url', 'video url', 'image url']),
+                demoPoster: indexOfAny(['demo poster', 'poster url', 'thumbnail url', 'thumbnail'])
             };
         }
 
         function playTimerBeep() {
             try {
-                const AudioContext = window.AudioContext || window.webkitAudioContext;
-                if (!AudioContext) return;
-                const ctx = new AudioContext();
-                const oscillator = ctx.createOscillator();
-                const gain = ctx.createGain();
-                oscillator.type = 'sine';
-                oscillator.frequency.value = 880;
-                gain.gain.value = 0.2;
-                oscillator.connect(gain);
-                gain.connect(ctx.destination);
-                oscillator.start();
-                setTimeout(() => {
-                    oscillator.stop();
-                    ctx.close();
-                }, 200);
+                const ctx = ensureAudioContext();
+                if (!ctx) return;
+                const now = ctx.currentTime;
+                const beepDuration = 0.12;
+                const gap = 0.08;
+                const baseFrequency = 880;
+
+                for (let i = 0; i < 3; i++) {
+                    const startTime = now + i * (beepDuration + gap);
+                    const oscillator = ctx.createOscillator();
+                    const gain = ctx.createGain();
+                    oscillator.type = 'sine';
+                    oscillator.frequency.value = baseFrequency;
+                    gain.gain.setValueAtTime(0.0001, startTime);
+                    gain.gain.linearRampToValueAtTime(0.2, startTime + 0.02);
+                    gain.gain.exponentialRampToValueAtTime(0.0001, startTime + beepDuration);
+                    oscillator.connect(gain);
+                    gain.connect(ctx.destination);
+                    oscillator.start(startTime);
+                    oscillator.stop(startTime + beepDuration);
+                }
             } catch (error) {
                 console.warn('Timer beep failed', error);
             }
@@ -519,6 +714,7 @@ Bodyweight Mastery,Friday,Calisthenics,Bulgarian Split Squats,3,10,60,Reps per l
         function hideAllScreens() {
             document.querySelectorAll('#homeScreen, #workoutSelectScreen, #activeWorkoutScreen, #importScreen, #historyScreen, #programsScreen')
                 .forEach(screen => screen.classList.add('hidden'));
+            closeExerciseDemo();
         }
 
         async function loadBuiltInPrograms() {
@@ -559,13 +755,23 @@ Bodyweight Mastery,Friday,Calisthenics,Bulgarian Split Squats,3,10,60,Reps per l
                     programMap[programName][title] = [];
                 }
 
+                const resolvedDemo = resolveDemoFields(
+                    exerciseValue,
+                    row[map.demoType],
+                    row[map.demoUrl],
+                    row[map.demoPoster]
+                );
+
                 programMap[programName][title].push({
                     name: exerciseValue,
                     sets: clampNumber(row[map.sets], MIN_SETS, MAX_SETS, 3),
                     reps: normalizeText(row[map.reps], MAX_REPS_LENGTH) || '10-12',
                     rest: clampNumber(row[map.rest], MIN_REST, MAX_REST, 60),
                     notes: normalizeText(row[map.notes], MAX_NOTES_LENGTH),
-                    suggestedWeight: normalizeText(row[map.suggestedWeight], MAX_WEIGHT_LENGTH)
+                    suggestedWeight: normalizeText(row[map.suggestedWeight], MAX_WEIGHT_LENGTH),
+                    demoType: resolvedDemo.demoType,
+                    demoUrl: resolvedDemo.demoUrl,
+                    demoPoster: resolvedDemo.demoPoster
                 });
             }
 
@@ -673,11 +879,22 @@ Bodyweight Mastery,Friday,Calisthenics,Bulgarian Split Squats,3,10,60,Reps per l
                 }))
             };
             ensureTimerState(currentWorkout.exercises.length);
-            
+            saveCurrentWorkout();
             hideAllScreens();
             document.getElementById('activeWorkoutScreen').classList.remove('hidden');
             document.getElementById('currentWorkoutTitle').textContent = dayName;
             renderExercises();
+            recordActivity();
+        }
+
+        function showActiveWorkout() {
+            if (!currentWorkout) return;
+            ensureTimerState(currentWorkout.exercises.length);
+            hideAllScreens();
+            document.getElementById('activeWorkoutScreen').classList.remove('hidden');
+            document.getElementById('currentWorkoutTitle').textContent = currentWorkout.day || '';
+            renderExercises();
+            recordActivity();
         }
 
         // Render exercises
@@ -722,6 +939,12 @@ Bodyweight Mastery,Friday,Calisthenics,Bulgarian Split Squats,3,10,60,Reps per l
                     card.appendChild(suggested);
                 }
 
+                const demoBtn = document.createElement('button');
+                demoBtn.className = 'btn btn-secondary exercise-demo-btn';
+                demoBtn.dataset.exIndex = String(exIndex);
+                demoBtn.textContent = 'How to Do It';
+                card.appendChild(demoBtn);
+
                 for (let setNum = 0; setNum < exercise.sets.length; setNum++) {
                     const setData = exercise.sets[setNum];
                     const group = document.createElement('div');
@@ -739,7 +962,7 @@ Bodyweight Mastery,Friday,Calisthenics,Bulgarian Split Squats,3,10,60,Reps per l
                     weightInput.className = 'weight-input';
                     weightInput.placeholder = 'Weight (lbs)';
                     weightInput.value = setData.weight;
-                    weightInput.addEventListener('change', (event) => {
+                    weightInput.addEventListener('input', (event) => {
                         updateSet(exIndex, setNum, 'weight', event.target.value);
                     });
 
@@ -748,7 +971,7 @@ Bodyweight Mastery,Friday,Calisthenics,Bulgarian Split Squats,3,10,60,Reps per l
                     repsInput.className = 'weight-input';
                     repsInput.placeholder = 'Reps';
                     repsInput.value = setData.reps;
-                    repsInput.addEventListener('change', (event) => {
+                    repsInput.addEventListener('input', (event) => {
                         updateSet(exIndex, setNum, 'reps', event.target.value);
                     });
 
@@ -763,7 +986,7 @@ Bodyweight Mastery,Friday,Calisthenics,Bulgarian Split Squats,3,10,60,Reps per l
                 const display = document.createElement('div');
                 display.className = 'timer-display';
                 display.dataset.exIndex = String(exIndex);
-                display.textContent = '00:00';
+                display.textContent = formatTime(timerSeconds[exIndex] || 0);
 
                 const quickBtns = document.createElement('div');
                 quickBtns.className = 'quick-timer-btns';
@@ -802,16 +1025,175 @@ Bodyweight Mastery,Friday,Calisthenics,Bulgarian Split Squats,3,10,60,Reps per l
                 
                 list.appendChild(card);
             });
+            resumeRunningTimers();
+        }
+
+        function openExerciseDemo(exercise) {
+            if (!exercise) return false;
+            selectedExerciseDemo = exercise;
+            const modal = document.getElementById('exerciseDemoModal');
+            const title = document.getElementById('exerciseDemoTitle');
+            const body = document.getElementById('exerciseDemoBody');
+            const sourceLink = document.getElementById('exerciseDemoSourceLink');
+            if (!modal || !title || !body || !sourceLink) return false;
+
+            title.textContent = exercise.name ? `${exercise.name} Demo` : 'Exercise Demo';
+            body.innerHTML = '';
+
+            const resolvedDemo = resolveDemoFields(
+                exercise.name || 'exercise',
+                exercise.demoType,
+                exercise.demoUrl,
+                exercise.demoPoster
+            );
+            const demoType = resolvedDemo.demoType;
+            const demoUrl = resolvedDemo.demoUrl;
+            const demoPoster = resolvedDemo.demoPoster;
+
+            sourceLink.classList.add('hidden');
+            sourceLink.removeAttribute('href');
+            sourceLink.textContent = 'Open Source';
+
+            if (!demoUrl) {
+                const fallbackMessage = document.createElement('div');
+                fallbackMessage.textContent = 'No demo is attached to this exercise yet.';
+                body.appendChild(fallbackMessage);
+                sourceLink.href = getYouTubeSearchUrl(exercise.name || 'exercise');
+                sourceLink.textContent = 'Search YouTube';
+                sourceLink.classList.remove('hidden');
+            } else if (demoType === 'youtube' || isYouTubeUrl(demoUrl)) {
+                const linkMessage = document.createElement('div');
+                linkMessage.textContent = 'Open the demo on YouTube. This avoids embedded playback errors on some devices.';
+                body.appendChild(linkMessage);
+                sourceLink.href = demoUrl;
+                sourceLink.textContent = 'Open on YouTube';
+                sourceLink.classList.remove('hidden');
+            } else if (demoType === 'video') {
+                const mediaWrap = document.createElement('div');
+                mediaWrap.className = 'demo-media-wrap';
+                const video = document.createElement('video');
+                video.className = 'demo-media';
+                video.controls = true;
+                video.playsInline = true;
+                video.preload = 'metadata';
+                if (demoPoster) video.poster = demoPoster;
+                video.src = demoUrl;
+                mediaWrap.appendChild(video);
+                body.appendChild(mediaWrap);
+
+                sourceLink.href = demoUrl;
+                sourceLink.classList.remove('hidden');
+            } else if (demoType === 'image' || demoType === 'gif') {
+                const mediaWrap = document.createElement('div');
+                mediaWrap.className = 'demo-media-wrap';
+                const image = document.createElement('img');
+                image.className = 'demo-media';
+                image.src = demoUrl;
+                image.alt = `${exercise.name || 'Exercise'} demo`;
+                mediaWrap.appendChild(image);
+                body.appendChild(mediaWrap);
+
+                sourceLink.href = demoUrl;
+                sourceLink.classList.remove('hidden');
+            } else {
+                const linkMessage = document.createElement('div');
+                linkMessage.textContent = 'Open the exercise demo in a new tab.';
+                body.appendChild(linkMessage);
+                sourceLink.href = demoUrl;
+                sourceLink.classList.remove('hidden');
+            }
+
+            modal.classList.remove('hidden');
+            return true;
+        }
+
+        function closeExerciseDemo() {
+            const modal = document.getElementById('exerciseDemoModal');
+            const body = document.getElementById('exerciseDemoBody');
+            if (!modal || !body) return;
+            modal.classList.add('hidden');
+            body.innerHTML = '';
+            selectedExerciseDemo = null;
+        }
+
+        function inferDemoType(rawType, url) {
+            const normalizedType = normalizeText(rawType, MAX_DEMO_TYPE_LENGTH).toLowerCase();
+            if (['youtube', 'video', 'image', 'gif', 'link'].includes(normalizedType)) return normalizedType;
+
+            const normalizedUrl = (url || '').toLowerCase().split('?')[0];
+            if (isYouTubeUrl(url || '')) return 'youtube';
+            if (/\.(mp4|webm|mov|m4v)$/.test(normalizedUrl)) return 'video';
+            if (/\.(gif)$/.test(normalizedUrl)) return 'gif';
+            if (/\.(png|jpe?g|webp|avif|svg)$/.test(normalizedUrl)) return 'image';
+            return normalizedUrl ? 'link' : '';
+        }
+
+        function isYouTubeUrl(url) {
+            const normalized = (url || '').toLowerCase();
+            return normalized.includes('youtube.com') || normalized.includes('youtu.be');
+        }
+
+        function normalizeDemoUrl(demoType, url, exerciseName) {
+            const cleanType = (demoType || '').toLowerCase();
+            if (cleanType !== 'youtube' && !isYouTubeUrl(url)) return url;
+
+            try {
+                const parsed = new URL(url, window.location.origin);
+                const host = parsed.hostname.toLowerCase();
+                const path = parsed.pathname;
+
+                if (host.includes('youtube.com')) {
+                    if (path.startsWith('/watch')) {
+                        const videoId = parsed.searchParams.get('v');
+                        if (videoId) return `https://www.youtube.com/watch?v=${videoId}`;
+                    }
+
+                    if (path.startsWith('/embed/')) {
+                        const videoId = path.split('/')[2];
+                        if (videoId) return `https://www.youtube.com/watch?v=${videoId}`;
+
+                        const listType = parsed.searchParams.get('listType');
+                        const list = parsed.searchParams.get('list');
+                        if (listType === 'search' && list) {
+                            return `https://www.youtube.com/results?search_query=${encodeURIComponent(list)}`;
+                        }
+                    }
+
+                    if (path === '/results') {
+                        const query = parsed.searchParams.get('search_query');
+                        if (query) return `https://www.youtube.com/results?search_query=${encodeURIComponent(query)}`;
+                    }
+                }
+
+                if (host.includes('youtu.be')) {
+                    const videoId = path.replace('/', '').split('/')[0];
+                    if (videoId) return `https://www.youtube.com/watch?v=${videoId}`;
+                }
+            } catch (error) {
+                console.warn('Could not normalize demo URL', error);
+            }
+
+            return getYouTubeSearchUrl(exerciseName);
         }
 
         function ensureTimerState(count) {
-            timerIntervals = new Array(count).fill(null);
-            timerSeconds = new Array(count).fill(0);
-            timerRunning = new Array(count).fill(false);
+            if (!Array.isArray(timerIntervals) || timerIntervals.length !== count) {
+                timerIntervals = new Array(count).fill(null);
+            }
+            if (!Array.isArray(timerSeconds) || timerSeconds.length !== count) {
+                timerSeconds = new Array(count).fill(0);
+            }
+            if (!Array.isArray(timerRunning) || timerRunning.length !== count) {
+                timerRunning = new Array(count).fill(false);
+            }
+            if (!Array.isArray(timerEndAt) || timerEndAt.length !== count) {
+                timerEndAt = new Array(count).fill(null);
+            }
         }
 
         function updateSet(exIndex, setNum, field, value) {
             currentWorkout.exercises[exIndex].sets[setNum][field] = value;
+            saveCurrentWorkout();
         }
 
         function getLastWeight(exerciseName) {
@@ -835,62 +1217,165 @@ Bodyweight Mastery,Friday,Calisthenics,Bulgarian Split Squats,3,10,60,Reps per l
             
             workoutHistory.push({...currentWorkout, completedAt: new Date().toISOString()});
             saveToStorage();
+            currentWorkout = null;
+            saveCurrentWorkout();
+            clearInactivityTimer();
             
             alert('Workout completed! Great work! 💪');
-            currentWorkout = null;
             showHome();
         }
 
         // Timer functions
         function startTimer(exIndex, seconds) {
             timerSeconds[exIndex] = seconds;
+            timerEndAt[exIndex] = Date.now() + seconds * 1000;
             updateTimerDisplay(exIndex);
             if (!timerRunning[exIndex]) {
                 toggleTimer(exIndex);
             }
+            saveCurrentWorkout();
         }
 
         function toggleTimer(exIndex) {
             const toggleBtn = document.querySelector(`.timer-toggle-btn[data-ex-index="${exIndex}"]`);
             if (timerRunning[exIndex]) {
-                clearInterval(timerIntervals[exIndex]);
-                timerIntervals[exIndex] = null;
+                clearTimerInterval(exIndex);
+                const remaining = getRemainingSeconds(exIndex);
+                timerSeconds[exIndex] = remaining;
+                timerEndAt[exIndex] = null;
                 timerRunning[exIndex] = false;
                 if (toggleBtn) toggleBtn.textContent = 'Start';
             } else {
-                timerIntervals[exIndex] = setInterval(() => {
-                    if (timerSeconds[exIndex] > 0) {
-                        timerSeconds[exIndex]--;
-                        updateTimerDisplay(exIndex);
-                    } else {
-                        resetTimer(exIndex);
-                        playTimerBeep();
-                        if (navigator.vibrate) {
-                            navigator.vibrate([200, 100, 200]);
-                        }
-                    }
-                }, 1000);
+                if (!timerEndAt[exIndex]) {
+                    timerEndAt[exIndex] = Date.now() + (timerSeconds[exIndex] || 0) * 1000;
+                }
+                startTimerInterval(exIndex);
                 timerRunning[exIndex] = true;
                 if (toggleBtn) toggleBtn.textContent = 'Pause';
             }
+            saveCurrentWorkout();
         }
 
         function resetTimer(exIndex) {
-            clearInterval(timerIntervals[exIndex]);
-            timerIntervals[exIndex] = null;
+            clearTimerInterval(exIndex);
             timerRunning[exIndex] = false;
             timerSeconds[exIndex] = 0;
+            timerEndAt[exIndex] = null;
             updateTimerDisplay(exIndex);
             const toggleBtn = document.querySelector(`.timer-toggle-btn[data-ex-index="${exIndex}"]`);
             if (toggleBtn) toggleBtn.textContent = 'Start';
+            saveCurrentWorkout();
         }
 
         function updateTimerDisplay(exIndex) {
             const display = document.querySelector(`.timer-display[data-ex-index="${exIndex}"]`);
             if (!display) return;
-            const mins = Math.floor(timerSeconds[exIndex] / 60);
-            const secs = timerSeconds[exIndex] % 60;
-            display.textContent = `${mins.toString().padStart(2, '0')}:${secs.toString().padStart(2, '0')}`;
+            display.textContent = formatTime(timerSeconds[exIndex] || 0);
+        }
+
+        function formatTime(totalSeconds) {
+            const mins = Math.floor(totalSeconds / 60);
+            const secs = totalSeconds % 60;
+            return `${mins.toString().padStart(2, '0')}:${secs.toString().padStart(2, '0')}`;
+        }
+
+        function getRemainingSeconds(exIndex) {
+            if (!timerEndAt[exIndex]) return timerSeconds[exIndex] || 0;
+            const remainingMs = timerEndAt[exIndex] - Date.now();
+            return Math.max(0, Math.ceil(remainingMs / 1000));
+        }
+
+        function startTimerInterval(exIndex) {
+            clearTimerInterval(exIndex);
+            timerIntervals[exIndex] = setInterval(() => tickTimer(exIndex), 250);
+            tickTimer(exIndex);
+        }
+
+        function clearTimerInterval(exIndex) {
+            clearInterval(timerIntervals[exIndex]);
+            timerIntervals[exIndex] = null;
+        }
+
+        function tickTimer(exIndex) {
+            if (!timerEndAt[exIndex]) {
+                updateTimerDisplay(exIndex);
+                return;
+            }
+            const remaining = getRemainingSeconds(exIndex);
+            timerSeconds[exIndex] = remaining;
+            updateTimerDisplay(exIndex);
+            if (remaining <= 0) {
+                resetTimer(exIndex);
+                playTimerBeep();
+                if (navigator.vibrate) {
+                    navigator.vibrate([100, 50, 100, 50, 100]);
+                }
+            }
+        }
+
+        function resumeRunningTimers() {
+            if (!currentWorkout) return;
+            timerRunning.forEach((running, exIndex) => {
+                if (running && timerEndAt[exIndex]) {
+                    startTimerInterval(exIndex);
+                } else {
+                    updateTimerDisplay(exIndex);
+                }
+            });
+        }
+
+        function ensureAudioContext() {
+            const AudioCtx = window.AudioContext || window.webkitAudioContext;
+            if (!AudioCtx) return null;
+            if (!audioContext) {
+                audioContext = new AudioCtx();
+            }
+            if (audioContext.state === 'suspended') {
+                audioContext.resume().catch(() => {});
+            }
+            return audioContext;
+        }
+
+        function recordActivity() {
+            if (!currentWorkout) {
+                clearInactivityTimer();
+                return;
+            }
+            clearInactivityTimer();
+            inactivityTimeout = setTimeout(() => {
+                autoCompleteWorkout();
+            }, INACTIVITY_COMPLETE_MS);
+        }
+
+        function clearInactivityTimer() {
+            if (inactivityTimeout) {
+                clearTimeout(inactivityTimeout);
+                inactivityTimeout = null;
+            }
+        }
+
+        function autoCompleteWorkout() {
+            if (!currentWorkout) return;
+            workoutHistory.push({...currentWorkout, completedAt: new Date().toISOString(), autoCompleted: true});
+            saveToStorage();
+            currentWorkout = null;
+            saveCurrentWorkout();
+            clearInactivityTimer();
+            showHome();
+            showToast('Workout auto-completed after 25 minutes of inactivity.');
+        }
+
+        function showToast(message, durationMs = 3500) {
+            const toast = document.getElementById('toast');
+            if (!toast) return;
+            toast.textContent = message;
+            toast.classList.remove('hidden');
+            toast.classList.add('toast-visible');
+            clearTimeout(toast._timeoutId);
+            toast._timeoutId = setTimeout(() => {
+                toast.classList.remove('toast-visible');
+                setTimeout(() => toast.classList.add('hidden'), 200);
+            }, durationMs);
         }
 
         // Stats

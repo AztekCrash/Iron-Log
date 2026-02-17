@@ -1,4 +1,4 @@
-Program,Day,Type,Exercise,Sets,Reps,Rest,Notes,Suggested Weight
+Program,Day,Type,Exercise,Sets,Reps,Rest,Notes,Suggested Weight,Demo Type,Demo URL,Demo Poster
 StrongLifts 5x5,Monday,Workout A,Barbell Squat,5,5,180,Add 5lbs each session,45
 StrongLifts 5x5,Monday,Workout A,Barbell Bench Press,5,5,180,Keep heels on floor,45
 StrongLifts 5x5,Monday,Workout A,Barbell Row,5,5,180,Pull to lower chest,45
