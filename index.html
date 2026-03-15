@@ -280,7 +280,6 @@
 
         <!-- Body Metrics Screen -->
         <div id="bodyMetricsScreen" class="hidden">
-            <button class="back-btn" id="bodyMetricsBackBtn">← Back</button>
             <div class="section">
                 <div class="section-title">Log Body Metrics</div>
                 
@@ -418,36 +417,36 @@ Full Body Essentials,Any,Full Body,Face Pulls,3,15,60,Target: Rear Delts/Shoulde
         }
 
         function bindEventHandlers() {
-            document.getElementById('startWorkoutBtn').addEventListener('click', showWorkoutSelect);
-            document.getElementById('viewHistoryBtn').addEventListener('click', showHistory);
-            document.getElementById('showImportBtn').addEventListener('click', showImport);
-            document.getElementById('showProgramsBtn').addEventListener('click', showPrograms);
-            document.getElementById('workoutSelectBackBtn').addEventListener('click', showHome);
-            document.getElementById('activeWorkoutBackBtn').addEventListener('click', showWorkoutSelect);
-            document.getElementById('completeWorkoutBtn').addEventListener('click', completeWorkout);
-            document.getElementById('importBackBtn').addEventListener('click', showHome);
-            document.getElementById('historyBackBtn').addEventListener('click', () => switchTab('tabMe'));
-            document.getElementById('programsBackBtn').addEventListener('click', showHome);
-            document.getElementById('nutritionProgressBackBtn').addEventListener('click', () => switchTab('tabFuel'));
-            document.getElementById('addMealBtn').addEventListener('click', () => {
+            document.getElementById('startWorkoutBtn')?.addEventListener('click', showWorkoutSelect);
+            document.getElementById('viewHistoryBtn')?.addEventListener('click', showHistory);
+            document.getElementById('showImportBtn')?.addEventListener('click', showImport);
+            document.getElementById('showProgramsBtn')?.addEventListener('click', showPrograms);
+            document.getElementById('workoutSelectBackBtn')?.addEventListener('click', showHome);
+            document.getElementById('activeWorkoutBackBtn')?.addEventListener('click', showWorkoutSelect);
+            document.getElementById('completeWorkoutBtn')?.addEventListener('click', completeWorkout);
+            document.getElementById('importBackBtn')?.addEventListener('click', showHome);
+            document.getElementById('historyBackBtn')?.addEventListener('click', () => switchTab('tabMe'));
+            document.getElementById('programsBackBtn')?.addEventListener('click', showHome);
+            document.getElementById('nutritionProgressBackBtn')?.addEventListener('click', () => switchTab('tabFuel'));
+            document.getElementById('addMealBtn')?.addEventListener('click', () => {
                 document.getElementById('mealNameInput').value = '';
                 document.getElementById('mealCalInput').value = '';
                 document.getElementById('mealProInput').value = '';
                 document.getElementById('mealFibInput').value = '';
                 document.getElementById('addMealModal').classList.remove('hidden');
             });
-            document.getElementById('cancelMealBtn').addEventListener('click', () => {
+            document.getElementById('cancelMealBtn')?.addEventListener('click', () => {
                 document.getElementById('addMealModal').classList.add('hidden');
             });
-            document.getElementById('confirmAddMealBtn').addEventListener('click', saveMeal);
-            document.getElementById('saveNotesBtn').addEventListener('click', saveNotes);
-            document.getElementById('viewNutritionProgressBtn').addEventListener('click', () => {
+            document.getElementById('confirmAddMealBtn')?.addEventListener('click', saveMeal);
+            document.getElementById('saveNotesBtn')?.addEventListener('click', saveNotes);
+            document.getElementById('viewNutritionProgressBtn')?.addEventListener('click', () => {
                 hideAllScreens();
                 document.getElementById('nutritionProgressScreen').classList.remove('hidden');
                 renderConsistencyChart(30); // Default to 30 days
             });
-            document.getElementById('backupDataBtn').addEventListener('click', exportData);
-            document.getElementById('restoreDataInput').addEventListener('change', importData);
+            document.getElementById('backupDataBtn')?.addEventListener('click', exportData);
+            document.getElementById('restoreDataInput')?.addEventListener('change', importData);
             
             // Chart Range Buttons
             document.querySelectorAll('.chart-range-btn').forEach(btn => {
@@ -463,14 +462,14 @@ Full Body Essentials,Any,Full Body,Face Pulls,3,15,60,Target: Rear Delts/Shoulde
                 });
             });
 
-            document.getElementById('bodyMetricsBackBtn').addEventListener('click', showHome);
-            document.getElementById('saveWeightBtn').addEventListener('click', () => saveBodyMetric('weight'));
-            document.getElementById('saveWaistBtn').addEventListener('click', () => saveBodyMetric('waist'));
-            document.getElementById('fileInput').addEventListener('change', handleFileUpload);
-            document.getElementById('cancelProgramBtn').addEventListener('click', closeProgramModal);
-            document.getElementById('confirmProgramBtn').addEventListener('click', confirmProgramLoad);
-            document.getElementById('closeExerciseDemoBtn').addEventListener('click', closeExerciseDemo);
-            document.getElementById('exerciseDemoModal').addEventListener('click', (event) => {
+            document.getElementById('bodyMetricsBackBtn')?.addEventListener('click', showHome);
+            document.getElementById('saveWeightBtn')?.addEventListener('click', () => saveBodyMetric('weight'));
+            document.getElementById('saveWaistBtn')?.addEventListener('click', () => saveBodyMetric('waist'));
+            document.getElementById('fileInput')?.addEventListener('change', handleFileUpload);
+            document.getElementById('cancelProgramBtn')?.addEventListener('click', closeProgramModal);
+            document.getElementById('confirmProgramBtn')?.addEventListener('click', confirmProgramLoad);
+            document.getElementById('closeExerciseDemoBtn')?.addEventListener('click', closeExerciseDemo);
+            document.getElementById('exerciseDemoModal')?.addEventListener('click', (event) => {
                 if (event.target.id === 'exerciseDemoModal') closeExerciseDemo();
             });
 
