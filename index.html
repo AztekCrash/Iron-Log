@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
     <title>Lift Tracker</title>
@@ -17,33 +17,111 @@
             <div class="subtitle">Easily Record Your Lifts</div>
         </header>
 
-        <!-- Home Screen -->
-        <div id="homeScreen">
+        <!-- Tab: Train -->
+        <div id="tabTrain" class="tab-content active">
+            <div id="trainDashboard">
             <div class="section">
-                <div class="section-title">Daily Tracking</div>
-                <div style="display: flex; gap: 10px;">
-                    <button class="btn btn-secondary" id="openNutritionBtn" style="flex: 1; background-color: var(--card-bg); color: var(--accent); border: 1px solid var(--accent); padding: 10px;">Nutrition Tracker</button>
-                    <button class="btn btn-secondary" id="openBodyMetricsBtn" style="flex: 1; background-color: var(--card-bg); color: var(--accent); border: 1px solid var(--accent); padding: 10px;">Body Metrics</button>
-                </div>
-            </div>
-
-            <div class="section">
-                <div class="section-title">Start Training</div>
+                <div class="section-title">Train</div>
                 <button class="btn" id="startWorkoutBtn">Start Workout</button>
-                <button class="btn btn-secondary" id="viewHistoryBtn">View History</button>
                 <div class="helper-text" id="planHint">No plan yet? Browse ready-made plans or import a template.</div>
             </div>
 
             <div class="section">
-                <div class="section-title">Get Started</div>
+                <div class="section-title">Training Plans</div>
                 <div class="helper-text">
                     Choose a plan to get moving fast, or import your own.
                 </div>
                 <button class="btn btn-secondary" id="showProgramsBtn">Browse Ready-Made Plans</button>
                 <button class="btn btn-secondary" id="showImportBtn">Import Plan</button>
-                <a class="template-link" href="Workout_Plan_Template.csv" download>Download Example Template</a>
             </div>
+            </div>
+        </div>
 
+        <!-- Tab: Fuel -->
+        <div id="tabFuel" class="tab-content">
+            <div id="fuelDashboard">
+            <div class="section">
+                <div class="section-title">Fuel</div>
+                <div style="display: flex; gap: 10px; margin-bottom: 15px;">
+                    <button class="btn" id="addMealBtn" style="flex: 1; padding: 10px;">+ Add Meal</button>
+                    <button class="btn btn-secondary" id="viewNutritionProgressBtn" style="flex: 1; padding: 10px;">Insights</button>
+                </div>
+                
+                <div class="exercise-card">
+                    <div class="exercise-name" style="margin-bottom: 10px;">Macro Progress (Today)</div>
+                    <div class="progress-container" style="margin-bottom: 10px;">
+                        <div style="display: flex; justify-content: space-between; font-size: 0.85rem; margin-bottom: 5px;">
+                            <span>Calories</span>
+                            <span id="calProgressText">0 / 2100</span>
+                        </div>
+                        <div style="background: var(--bg-card); height: 8px; border-radius: 4px; overflow: hidden; border: 1px solid var(--border);">
+                            <div id="calProgressBar" style="background: var(--accent-primary); width: 0%; height: 100%; transition: width 0.3s; border-radius: 4px;"></div>
+                        </div>
+                    </div>
+                    <div class="progress-container" style="margin-bottom: 10px;">
+                        <div style="display: flex; justify-content: space-between; font-size: 0.85rem; margin-bottom: 5px;">
+                            <span>Protein (g)</span>
+                            <span id="proProgressText">0 / 160</span>
+                        </div>
+                        <div style="background: var(--bg-card); height: 8px; border-radius: 4px; overflow: hidden; border: 1px solid var(--border);">
+                            <div id="proProgressBar" style="background: var(--accent-primary); width: 0%; height: 100%; transition: width 0.3s; border-radius: 4px;"></div>
+                        </div>
+                    </div>
+                    <div class="progress-container">
+                        <div style="display: flex; justify-content: space-between; font-size: 0.85rem; margin-bottom: 5px;">
+                            <span>Fiber (g)</span>
+                            <span id="fibProgressText">0 / 30</span>
+                        </div>
+                        <div style="background: var(--bg-card); height: 8px; border-radius: 4px; overflow: hidden; border: 1px solid var(--border);">
+                            <div id="fibProgressBar" style="background: var(--accent-primary); width: 0%; height: 100%; transition: width 0.3s; border-radius: 4px;"></div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="exercise-card">
+                    <div class="exercise-name" style="margin-bottom: 10px;">Today's Meals</div>
+                    <div id="todaysMealsList"></div>
+                    <div id="noMealsPlaceholder" style="color: var(--text-secondary); text-align: center; padding: 10px; font-size: 0.9rem;">
+                        No meals logged yet today.
+                    </div>
+                </div>
+
+                <div class="exercise-card">
+                    <div class="exercise-name" style="margin-bottom: 10px;">Daily Notes (Optional)</div>
+                    <textarea id="nutNotes" class="weight-input" style="width: 100%; height: 80px; resize: none; font-family: 'Roboto Condensed', sans-serif; padding: 10px;" placeholder="How did you feel today?"></textarea>
+                    <div style="text-align: right; margin-top: 10px;">
+                        <button class="btn btn-secondary" id="saveNotesBtn" style="padding: 5px 10px; font-size: 0.8rem;">Save Notes</button>
+                    </div>
+                </div>
+            </div>
+            </div>
+        </div>
+
+        <!-- Tab: Body -->
+        <div id="tabBody" class="tab-content">
+            <div class="section">
+                <div class="section-title">Body Metrics</div>
+                
+                <div class="exercise-card" style="margin-bottom: 20px;">
+                    <div class="exercise-name" style="margin-bottom: 10px;">Log New Metric</div>
+                    <div class="set-input-group">
+                        <input type="number" id="metricWeight" class="weight-input" placeholder="Weight (lbs)" step="0.1">
+                        <button class="btn btn-secondary" style="padding: 10px;" onclick="saveBodyMetric('weight')">Save</button>
+                    </div>
+                    <div class="set-input-group" style="margin-top: 10px;">
+                        <input type="number" id="metricWaist" class="weight-input" placeholder="Waist (inches)" step="0.1">
+                        <button class="btn btn-secondary" style="padding: 10px;" onclick="saveBodyMetric('waist')">Save</button>
+                    </div>
+                </div>
+
+                <div class="section-title" style="font-size: 1.2rem;">History</div>
+                <div id="bodyMetricsHistoryList"></div>
+            </div>
+        </div>
+
+        <!-- Tab: Me -->
+        <div id="tabMe" class="tab-content">
+            <div id="meDashboard">
             <div class="section section-compact">
                 <div class="section-title">Recent Stats</div>
                 <div class="stats-grid stats-compact">
@@ -61,11 +139,21 @@
                     </div>
                 </div>
             </div>
+            
+            <div class="section">
+                <div class="section-title">History & Data</div>
+                <button class="btn btn-secondary" id="viewHistoryBtn">View Workout History</button>
+                <div style="display: flex; gap: 10px; margin-top: 10px; align-items: stretch;">
+                    <button class="btn btn-secondary" id="backupDataBtn" style="flex: 1; margin: 0; padding: 10px; display: flex; align-items: center; justify-content: center; box-sizing: border-box;">Backup Data</button>
+                    <label for="restoreDataInput" class="btn btn-secondary" style="flex: 1; margin: 0; padding: 10px; display: flex; align-items: center; justify-content: center; box-sizing: border-box; cursor: pointer;">Restore Data</label>
+                    <input type="file" id="restoreDataInput" accept=".json" style="display: none;">
+                </div>
+            </div>
+            </div>
         </div>
 
         <!-- Workout Selection Screen -->
         <div id="workoutSelectScreen" class="hidden">
-            <button class="back-btn" id="workoutSelectBackBtn">← Back</button>
             <div class="section">
                 <div class="section-title">Select Workout</div>
                 <div id="workoutDaysList"></div>
@@ -74,7 +162,6 @@
 
         <!-- Programs Screen -->
         <div id="programsScreen" class="hidden">
-            <button class="back-btn" id="programsBackBtn">← Back</button>
             <div class="section">
                 <div class="section-title">Programs</div>
                 <div id="programsList"></div>
@@ -83,7 +170,6 @@
 
         <!-- Active Workout Screen -->
         <div id="activeWorkoutScreen" class="hidden">
-            <button class="back-btn" id="activeWorkoutBackBtn">← Back</button>
             <div class="section">
                 <div class="section-title" id="currentWorkoutTitle"></div>
                 <div id="exercisesList"></div>
@@ -95,7 +181,6 @@
 
         <!-- Import Screen -->
         <div id="importScreen" class="hidden">
-            <button class="back-btn" id="importBackBtn">← Back</button>
             <div class="section">
                 <div class="section-title">Import Workout Plan</div>
                 <label for="fileInput" class="file-label">
@@ -110,7 +195,6 @@
 
         <!-- History Screen -->
         <div id="historyScreen" class="hidden">
-            <button class="back-btn" id="historyBackBtn">← Back</button>
             <div class="section">
                 <div class="section-title">Workout History</div>
                 <div id="historyList"></div>
@@ -140,65 +224,7 @@
             </div>
         </div>
 
-        <!-- Nutrition Screen -->
-        <!-- Daily Nutrition Tracker Screen -->
-        <div id="nutritionTrackerScreen" class="hidden">
-            <button class="back-btn" id="nutritionTrackerBackBtn">← Back</button>
-            <div class="section">
-                <div class="section-title">Daily Nutrition Tracker</div>
-                <div style="display: flex; gap: 10px; margin-bottom: 15px;">
-                    <button class="btn" id="addMealBtn" style="flex: 1; padding: 10px;">+ Add Meal/Snack</button>
-                    <button class="btn btn-secondary" id="viewNutritionProgressBtn" style="flex: 1; padding: 10px;">Progress & Insights</button>
-                </div>
-                
-                <div class="exercise-card">
-                    <div class="exercise-name" style="margin-bottom: 10px;">Macro Progress (Today)</div>
-                    <div class="progress-container" style="margin-bottom: 10px;">
-                        <div style="display: flex; justify-content: space-between; font-size: 0.85rem; margin-bottom: 5px;">
-                            <span>Calories</span>
-                            <span id="calProgressText">0 / 2100</span>
-                        </div>
-                        <div style="background: var(--bg-color); height: 8px; border-radius: 4px; overflow: hidden;">
-                            <div id="calProgressBar" style="background: var(--accent); width: 0%; height: 100%; transition: width 0.3s; border-radius: 4px;"></div>
-                        </div>
-                    </div>
-                    <div class="progress-container" style="margin-bottom: 10px;">
-                        <div style="display: flex; justify-content: space-between; font-size: 0.85rem; margin-bottom: 5px;">
-                            <span>Protein (g)</span>
-                            <span id="proProgressText">0 / 160</span>
-                        </div>
-                        <div style="background: var(--bg-color); height: 8px; border-radius: 4px; overflow: hidden;">
-                            <div id="proProgressBar" style="background: var(--accent); width: 0%; height: 100%; transition: width 0.3s; border-radius: 4px;"></div>
-                        </div>
-                    </div>
-                    <div class="progress-container">
-                        <div style="display: flex; justify-content: space-between; font-size: 0.85rem; margin-bottom: 5px;">
-                            <span>Fiber (g)</span>
-                            <span id="fibProgressText">0 / 30</span>
-                        </div>
-                        <div style="background: var(--bg-color); height: 8px; border-radius: 4px; overflow: hidden;">
-                            <div id="fibProgressBar" style="background: var(--accent); width: 0%; height: 100%; transition: width 0.3s; border-radius: 4px;"></div>
-                        </div>
-                    </div>
-                </div>
-
-                <div class="exercise-card">
-                    <div class="exercise-name" style="margin-bottom: 10px;">Today's Meals</div>
-                    <div id="todaysMealsList"></div>
-                    <div id="noMealsPlaceholder" style="color: var(--text-secondary); text-align: center; padding: 10px; font-size: 0.9rem;">
-                        No meals logged yet today.
-                    </div>
-                </div>
-
-                <div class="exercise-card">
-                    <div class="exercise-name" style="margin-bottom: 10px;">Daily Notes (Optional)</div>
-                    <textarea id="nutNotes" class="weight-input" style="width: 100%; height: 80px; resize: none; font-family: 'Roboto Condensed', sans-serif; padding: 10px;" placeholder="How did you feel today?"></textarea>
-                    <div style="text-align: right; margin-top: 10px;">
-                        <button class="btn btn-secondary" id="saveNotesBtn" style="padding: 5px 10px; font-size: 0.8rem;">Save Notes</button>
-                    </div>
-                </div>
-            </div>
-        </div>
+        <!-- The nutrition tracker is now natively part of tabFuel, so removing old wrapper -->
 
         <!-- Add Meal Modal -->
         <div id="addMealModal" class="modal hidden">
@@ -225,7 +251,6 @@
 
         <!-- Nutrition Progress / Chart Screen -->
         <div id="nutritionProgressScreen" class="hidden">
-            <button class="back-btn" id="nutritionProgressBackBtn">← Back</button>
             <div class="section">
                 <div class="section-title">Progress & Insights</div>
                 
@@ -283,6 +308,26 @@
                 <div id="bodyMetricsHistoryList"></div>
             </div>
         </div>
+
+        <!-- Bottom Navigation -->
+        <nav class="bottom-nav">
+            <div class="nav-item active" data-tab="tabTrain" onclick="switchTab('tabTrain')">
+                <div class="nav-icon"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m6.5 6.5 11 11"/><path d="m21 21-1-1"/><path d="m3 3 1 1"/><path d="m18 22 4-4"/><path d="m2 6 4-4"/><path d="m3 10 7-7"/><path d="m14 21 7-7"/></svg></div>
+                Train
+            </div>
+            <div class="nav-item" data-tab="tabFuel" onclick="switchTab('tabFuel')">
+                <div class="nav-icon"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 2v7c0 1.1.9 2 2 2h4a2 2 0 0 0 2-2V2"/><path d="M7 2v20"/><path d="M21 15V2A5 5 0 0 0 16 7v6c0 1.1.9 2 2 2h3Z"/><path d="M21 15v7"/></svg></div>
+                Fuel
+            </div>
+            <div class="nav-item" data-tab="tabBody" onclick="switchTab('tabBody')">
+                <div class="nav-icon"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 12h-4l-3 9L9 3l-3 9H2"/></svg></div>
+                Body
+            </div>
+            <div class="nav-item" data-tab="tabMe" onclick="switchTab('tabMe')">
+                <div class="nav-icon"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M19 21v-2a4 4 0 0 0-4-4H9a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg></div>
+                Me
+            </div>
+        </nav>
     </div>
     <div id="toast" class="toast hidden" role="status" aria-live="polite"></div>
 
@@ -381,19 +426,9 @@ Full Body Essentials,Any,Full Body,Face Pulls,3,15,60,Target: Rear Delts/Shoulde
             document.getElementById('activeWorkoutBackBtn').addEventListener('click', showWorkoutSelect);
             document.getElementById('completeWorkoutBtn').addEventListener('click', completeWorkout);
             document.getElementById('importBackBtn').addEventListener('click', showHome);
-            document.getElementById('historyBackBtn').addEventListener('click', showHome);
+            document.getElementById('historyBackBtn').addEventListener('click', () => switchTab('tabMe'));
             document.getElementById('programsBackBtn').addEventListener('click', showHome);
-            document.getElementById('openNutritionBtn').addEventListener('click', () => {
-                hideAllScreens();
-                document.getElementById('nutritionTrackerScreen').classList.remove('hidden');
-                renderDailyNutrition();
-            });
-            document.getElementById('openBodyMetricsBtn').addEventListener('click', () => {
-                hideAllScreens();
-                document.getElementById('bodyMetricsScreen').classList.remove('hidden');
-                renderBodyMetrics();
-            });
-            document.getElementById('nutritionTrackerBackBtn').addEventListener('click', showHome);
+            document.getElementById('nutritionProgressBackBtn').addEventListener('click', () => switchTab('tabFuel'));
             document.getElementById('addMealBtn').addEventListener('click', () => {
                 document.getElementById('mealNameInput').value = '';
                 document.getElementById('mealCalInput').value = '';
@@ -411,11 +446,8 @@ Full Body Essentials,Any,Full Body,Face Pulls,3,15,60,Target: Rear Delts/Shoulde
                 document.getElementById('nutritionProgressScreen').classList.remove('hidden');
                 renderConsistencyChart(30); // Default to 30 days
             });
-            document.getElementById('nutritionProgressBackBtn').addEventListener('click', () => {
-                hideAllScreens();
-                document.getElementById('nutritionTrackerScreen').classList.remove('hidden');
-                renderDailyNutrition();
-            });
+            document.getElementById('backupDataBtn').addEventListener('click', exportData);
+            document.getElementById('restoreDataInput').addEventListener('change', importData);
             
             // Chart Range Buttons
             document.querySelectorAll('.chart-range-btn').forEach(btn => {
@@ -898,11 +930,41 @@ Full Body Essentials,Any,Full Body,Face Pulls,3,15,60,Target: Rear Delts/Shoulde
         }
 
         // Navigation
-        function showHome() {
+        function switchTab(tabId) {
             hideAllScreens();
-            document.getElementById('homeScreen').classList.remove('hidden');
-            updateStats();
-            updatePlanHint();
+            
+            // Deactivate all
+            document.querySelectorAll('.tab-content').forEach(t => t.classList.remove('active'));
+            document.querySelectorAll('.nav-item').forEach(i => i.classList.remove('active'));
+            
+            // Activate target
+            const targetTab = document.getElementById(tabId);
+            if (targetTab) targetTab.classList.add('active');
+            
+            const targetIcon = document.querySelector(`.nav-item[data-tab="${tabId}"]`);
+            if (targetIcon) targetIcon.classList.add('active');
+
+            // Trigger specific renders
+            if (tabId === 'tabFuel') {
+                const fd = document.getElementById('fuelDashboard');
+                if (fd) fd.classList.remove('hidden');
+                renderDailyNutrition();
+            }
+            if (tabId === 'tabBody') renderBodyMetrics();
+            if (tabId === 'tabMe') {
+                const md = document.getElementById('meDashboard');
+                if (md) md.classList.remove('hidden');
+                updateStats();
+            }
+            if (tabId === 'tabTrain') {
+                const td = document.getElementById('trainDashboard');
+                if (td) td.classList.remove('hidden');
+                updatePlanHint();
+            }
+        }
+
+        function showHome() {
+            switchTab('tabTrain');
         }
 
         function showWorkoutSelect() {
@@ -1006,21 +1068,24 @@ Full Body Essentials,Any,Full Body,Face Pulls,3,15,60,Target: Rear Delts/Shoulde
                     const timeStr = meal.time ? ` (${meal.time})` : '';
                     left.innerHTML = `<strong>${nameStr}</strong><span style="color: var(--text-secondary); font-size: 0.8rem;">${timeStr}</span><br><span style="font-size: 0.8rem; color: var(--text-secondary);">${meal.calories || 0}c • ${meal.protein || 0}g P • ${meal.fiber || 0}g F</span>`;
                     
-                    const right = document.createElement('button');
-                    right.textContent = '✕';
-                    right.className = 'btn-secondary';
-                    right.style.padding = '2px 8px';
-                    right.style.backgroundColor = 'transparent';
-                    right.style.border = 'none';
-                    right.onclick = () => {
+                    const onEditClick = () => {
+                        document.getElementById('mealNameInput').value = meal.name || '';
+                        document.getElementById('mealCalInput').value = meal.calories || '';
+                        document.getElementById('mealProInput').value = meal.protein || '';
+                        document.getElementById('mealFibInput').value = meal.fiber || '';
+                        document.getElementById('confirmAddMealBtn').dataset.editIdx = idx;
+                        document.querySelector('#addMealModal .section-title').textContent = 'Edit Meal or Snack';
+                        document.getElementById('addMealModal').classList.remove('hidden');
+                    };
+
+                    const onDeleteClick = () => {
                         nut.meals.splice(idx, 1);
                         saveToStorage();
                         renderDailyNutrition();
                     };
 
-                    row.appendChild(left);
-                    row.appendChild(right);
-                    mealsList.appendChild(row);
+                    const swipeWrapper = createSwipeableCard(left, onDeleteClick, onEditClick);
+                    mealsList.appendChild(swipeWrapper);
                 });
             }
 
@@ -1039,13 +1104,26 @@ Full Body Essentials,Any,Full Body,Face Pulls,3,15,60,Target: Rear Delts/Shoulde
             }
 
             const today = getTodayNutrition();
-            today.meals.push({
-                name: name || `Meal ${today.meals.length + 1}`,
-                calories: cal,
-                protein: pro,
-                fiber: fib,
-                time: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
-            });
+            const editIdx = document.getElementById('confirmAddMealBtn').dataset.editIdx;
+
+            if (editIdx !== undefined && editIdx !== '') {
+                // Editing existing
+                today.meals[editIdx].name = name || `Meal ${parseInt(editIdx) + 1}`;
+                today.meals[editIdx].calories = cal;
+                today.meals[editIdx].protein = pro;
+                today.meals[editIdx].fiber = fib;
+                document.getElementById('confirmAddMealBtn').dataset.editIdx = '';
+                document.querySelector('#addMealModal .section-title').textContent = 'Add Meal or Snack';
+            } else {
+                // New meal
+                today.meals.push({
+                    name: name || `Meal ${today.meals.length + 1}`,
+                    calories: cal,
+                    protein: pro,
+                    fiber: fib,
+                    time: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
+                });
+            }
             
             saveToStorage();
             document.getElementById('addMealModal').classList.add('hidden');
@@ -1098,33 +1176,22 @@ Full Body Essentials,Any,Full Body,Face Pulls,3,15,60,Target: Rear Delts/Shoulde
                 const dDate = new Date(log.date);
                 const card = document.createElement('div');
                 card.className = 'exercise-card';
-                card.style.marginBottom = '10px';
-                card.style.display = 'flex';
-                card.style.justifyContent = 'space-between';
-                card.style.alignItems = 'center';
+                card.style.marginBottom = '0'; // default container handles margin
 
-                const left = document.createElement('div');
                 const tName = log.type.charAt(0).toUpperCase() + log.type.slice(1);
                 const unit = log.type === 'weight' ? 'lbs' : 'in';
                 const timeString = dDate.toLocaleTimeString([], { hour: 'numeric', minute: '2-digit' });
-                left.innerHTML = `<span style="color: var(--text-secondary); font-size: 0.85rem;">${dDate.toLocaleDateString()} at ${timeString}</span><br><strong style="font-size: 1.1rem; color: var(--text-primary);">${tName}: ${log.value} ${unit}</strong>`;
+                card.innerHTML = `<span style="color: var(--text-secondary); font-size: 0.85rem;">${dDate.toLocaleDateString()} at ${timeString}</span><br><strong style="font-size: 1.1rem; color: var(--text-primary);">${tName}: ${log.value} ${unit}</strong>`;
                 
-                const right = document.createElement('button');
-                right.textContent = 'Delete';
-                right.className = 'btn-secondary';
-                right.style.padding = '4px 8px';
-                right.style.fontSize = '0.8rem';
-                right.onclick = () => {
-                    if (confirm('Delete this log?')) {
+                const swipeWrapper = createSwipeableCard(card, () => {
+                    if (confirm('Delete this metric?')) {
                         bodyMetricsHistory.splice(idx, 1);
                         saveToStorage();
                         renderBodyMetrics();
                     }
-                };
+                });
 
-                card.appendChild(left);
-                card.appendChild(right);
-                list.appendChild(card);
+                list.appendChild(swipeWrapper);
             });
         }
 
@@ -1249,8 +1316,10 @@ Full Body Essentials,Any,Full Body,Face Pulls,3,15,60,Target: Rear Delts/Shoulde
         }
 
         function hideAllScreens() {
-            document.querySelectorAll('#homeScreen, #workoutSelectScreen, #activeWorkoutScreen, #importScreen, #historyScreen, #programsScreen, #nutritionTrackerScreen, #bodyMetricsScreen, #nutritionProgressScreen')
-                .forEach(screen => screen.classList.add('hidden'));
+            document.querySelectorAll('#trainDashboard, #fuelDashboard, #meDashboard, #workoutSelectScreen, #activeWorkoutScreen, #importScreen, #historyScreen, #programsScreen, #nutritionProgressScreen')
+                .forEach(screen => {
+                    if (screen) screen.classList.add('hidden');
+                });
             closeExerciseDemo();
         }
 
@@ -1983,7 +2052,15 @@ Full Body Essentials,Any,Full Body,Face Pulls,3,15,60,Target: Rear Delts/Shoulde
                     row.textContent = `${exercise.name}: ${total} total`;
                     card.appendChild(row);
                 });
-                list.appendChild(card);
+
+                const swipeWrapper = createSwipeableCard(card, () => {
+                    const actualIndex = workoutHistory.length - 1 - index;
+                    workoutHistory.splice(actualIndex, 1);
+                    saveToStorage();
+                    renderHistory();
+                    updateStats();
+                });
+                list.appendChild(swipeWrapper);
             });
         }
 
@@ -1996,6 +2073,126 @@ Full Body Essentials,Any,Full Body,Face Pulls,3,15,60,Target: Rear Delts/Shoulde
                 return sum + (weight * reps);
             }, 0);
             return `${Math.round(total)} lbs`;
+        }
+
+        // Data Backup & Restore
+        function exportData() {
+            const data = {
+                workoutPlan,
+                workoutHistory,
+                nutritionHistory,
+                bodyMetricsHistory,
+                exportDate: new Date().toISOString()
+            };
+            const jsonStr = JSON.stringify(data, null, 2);
+            const blob = new Blob([jsonStr], { type: "application/json" });
+            const url = URL.createObjectURL(blob);
+            
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = `ironlog_backup_${getTodayKey()}.json`;
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+            URL.revokeObjectURL(url);
+            showToast('Backup successful!');
+        }
+
+        function importData(event) {
+            const file = event.target.files[0];
+            if (!file) return;
+
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                try {
+                    const parsed = JSON.parse(e.target.result);
+                    if (parsed.workoutHistory || parsed.nutritionHistory) {
+                        if (confirm('This will overwrite your existing data. Are you sure?')) {
+                            if (parsed.workoutPlan) workoutPlan = parsed.workoutPlan;
+                            if (parsed.workoutHistory) workoutHistory = parsed.workoutHistory;
+                            if (parsed.nutritionHistory) nutritionHistory = parsed.nutritionHistory;
+                            if (parsed.bodyMetricsHistory) bodyMetricsHistory = parsed.bodyMetricsHistory;
+                            
+                            saveToStorage();
+                            init();
+                            switchTab('tabMe');
+                            showToast('Data Restored Successfully!');
+                        }
+                    } else {
+                        alert('Invalid backup file. Missing critical log data.');
+                    }
+                } catch (error) {
+                    alert('Error reading backup file format.');
+                    console.error(error);
+                }
+                // Reset input to allow selecting the same file again
+                event.target.value = '';
+            };
+            reader.readAsText(file);
+        }
+
+        // Swipe To Delete Helper
+        function createSwipeableCard(contentElement, onDelete, onContentClick = null) {
+            const container = document.createElement('div');
+            container.className = 'swipe-container';
+
+            const actions = document.createElement('div');
+            actions.className = 'swipe-actions';
+            actions.innerHTML = '<div>✕</div>';
+            actions.onclick = onDelete;
+
+            contentElement.classList.add('swipe-content');
+            if (onContentClick) {
+                contentElement.onclick = (e) => {
+                    // Prevent click if we were dragging
+                    if (Math.abs(currentX) > 5) return;
+                    onContentClick(e);
+                };
+            }
+
+            let startX = 0;
+            let currentX = 0;
+            let isDragging = false;
+
+            const startDrag = (clientX) => {
+                startX = clientX;
+                isDragging = true;
+                contentElement.style.transition = 'none';
+            };
+
+            const drag = (clientX) => {
+                if (!isDragging) return;
+                const deltaX = clientX - startX;
+                if (deltaX < 0 && deltaX > -100) {
+                    currentX = deltaX;
+                    contentElement.style.transform = `translateX(${deltaX}px)`;
+                }
+            };
+
+            const endDrag = () => {
+                if (!isDragging) return;
+                isDragging = false;
+                contentElement.style.transition = 'transform 0.2s ease';
+                if (currentX < -40) {
+                    contentElement.style.transform = `translateX(-80px)`;
+                } else {
+                    contentElement.style.transform = `translateX(0px)`;
+                }
+                setTimeout(() => currentX = 0, 50); // Small delay to allow click handler to read currentX if needed
+            };
+
+            contentElement.addEventListener('touchstart', (e) => startDrag(e.touches[0].clientX), {passive: true});
+            contentElement.addEventListener('touchmove', (e) => drag(e.touches[0].clientX), {passive: true});
+            contentElement.addEventListener('touchend', endDrag);
+
+            contentElement.addEventListener('mousedown', (e) => startDrag(e.clientX));
+            contentElement.addEventListener('mousemove', (e) => drag(e.clientX));
+            contentElement.addEventListener('mouseup', endDrag);
+            contentElement.addEventListener('mouseleave', endDrag);
+
+            container.appendChild(actions);
+            container.appendChild(contentElement);
+            return container;
         }
 
 
