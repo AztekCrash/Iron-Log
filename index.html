@@ -348,7 +348,30 @@
         let audioContext = null;
         let inactivityTimeout = null;
         const INACTIVITY_COMPLETE_MS = 25 * 60 * 1000;
-        const PROGRAMS_CSV = `Program,Day,Type,Exercise,Sets,Reps,Rest,Notes,Suggested Weight
+        const PROGRAMS_CSV = `Program,Day,Type,Exercise,Sets,Reps,Rest,Notes,Suggested Weight,Demo Type,Demo URL,Demo Poster
+Standardized Workout Plan,Sunday,Upper A,Flat Dumbbell Bench Press,4,8,150,Per dumbbell; use neutral or semi-neutral grip if shoulders prefer it,35.0,link,https://www.youtube.com/results?search_query=flat+dumbbell+bench+press+exercise+form,
+Standardized Workout Plan,Sunday,Upper A,Pull Ups,4,5,150,Bodyweight; stop 1 rep before form breaks,,link,https://www.youtube.com/results?search_query=pull+ups+exercise+form,
+Standardized Workout Plan,Sunday,Upper A,Dips,3,8,120,Bodyweight; slight forward lean; stop before shoulder discomfort,,link,https://www.youtube.com/results?search_query=dips+exercise+form,
+Standardized Workout Plan,Sunday,Upper A,Chest Supported Dumbbell Row,4,10,90,Per dumbbell,40.0,link,https://www.youtube.com/results?search_query=chest+supported+dumbbell+row+exercise+form,
+Standardized Workout Plan,Sunday,Upper A,Face Pull,3,15,60,Controlled tempo,70.0,link,https://www.youtube.com/results?search_query=face+pull+exercise+form,
+Standardized Workout Plan,Sunday,Upper A,Cable Crunch,4,12,60,Hard contraction on each rep,80.0,link,https://www.youtube.com/results?search_query=cable+crunch+exercise+form,
+Standardized Workout Plan,Monday,Lower A,Goblet Squat,4,10,120,Use one dumbbell or kettlebell held at chest,45.0,link,https://www.youtube.com/results?search_query=goblet+squat+exercise+form,
+Standardized Workout Plan,Monday,Lower A,Bulgarian Split Squat,3,10 per leg,90,20 each hand,20.0,link,https://www.youtube.com/results?search_query=bulgarian+split+squat+exercise+form,
+Standardized Workout Plan,Monday,Lower A,Dumbbell Romanian Deadlift,3,10,120,Per dumbbell; soft knees and push hips back,35.0,link,https://www.youtube.com/results?search_query=dumbbell+romanian+deadlift+exercise+form,
+Standardized Workout Plan,Monday,Lower A,45 Degree Back Extension,3,12,90,Bodyweight; stop at straight line not hyperextension,,link,https://www.youtube.com/results?search_query=45+degree+back+extension+exercise+form,
+Standardized Workout Plan,Monday,Lower A,Side Plank,3,30 sec per side,45,Bodyweight,,link,https://www.youtube.com/results?search_query=side+plank+exercise+form,
+Standardized Workout Plan,Wednesday,Upper B,Dips,4,8,120,Bodyweight; slight forward lean,,link,https://www.youtube.com/results?search_query=dips+exercise+form,
+Standardized Workout Plan,Wednesday,Upper B,Pull Ups,5,4,150,Bodyweight,,link,https://www.youtube.com/results?search_query=pull+ups+exercise+form,
+Standardized Workout Plan,Wednesday,Upper B,Flat Dumbbell Bench Press,3,10,120,Per dumbbell; lighter volume day,30.0,link,https://www.youtube.com/results?search_query=flat+dumbbell+bench+press+exercise+form,
+Standardized Workout Plan,Wednesday,Upper B,One Arm Dumbbell Row,4,10 per side,90,Per side,45.0,link,https://www.youtube.com/results?search_query=one+arm+dumbbell+row+exercise+form,
+Standardized Workout Plan,Wednesday,Upper B,Seated Dumbbell Shoulder Press,3,8,120,Per dumbbell; keep conservative for shoulders,25.0,link,https://www.youtube.com/results?search_query=seated+dumbbell+shoulder+press+exercise+form,
+Standardized Workout Plan,Wednesday,Upper B,Preacher Curl Machine,3,10,60,,65.0,link,https://www.youtube.com/results?search_query=preacher+curl+machine+exercise+form,
+Standardized Workout Plan,Wednesday,Upper B,Face Pull,2,15,60,Controlled tempo,60.0,link,https://www.youtube.com/results?search_query=face+pull+exercise+form,
+Standardized Workout Plan,Friday,Lower B,Dumbbell Romanian Deadlift,4,8,120,Per dumbbell; controlled hinge,40.0,link,https://www.youtube.com/results?search_query=dumbbell+romanian+deadlift+exercise+form,
+Standardized Workout Plan,Friday,Lower B,Goblet Squat,3,8,120,Use one dumbbell or kettlebell held at chest,50.0,link,https://www.youtube.com/results?search_query=goblet+squat+exercise+form,
+Standardized Workout Plan,Friday,Lower B,Reverse Lunge,3,10 per leg,90,20 each hand,20.0,link,https://www.youtube.com/results?search_query=reverse+lunge+exercise+form,
+Standardized Workout Plan,Friday,Lower B,45 Degree Back Extension,3,12,90,Hold 10 lb plate to chest when bodyweight is easy,10.0,link,https://www.youtube.com/results?search_query=45+degree+back+extension+exercise+form,
+Standardized Workout Plan,Friday,Lower B,Cable Crunch,4,12,60,Hard contraction on each rep,80.0,link,https://www.youtube.com/results?search_query=cable+crunch+exercise+form,
 StrongLifts 5x5,Monday,Workout A,Barbell Squat,5,5,180,Add 5lbs each session,45
 StrongLifts 5x5,Monday,Workout A,Barbell Bench Press,5,5,180,Keep heels on floor,45
 StrongLifts 5x5,Monday,Workout A,Barbell Row,5,5,180,Pull to lower chest,45
@@ -1386,7 +1409,8 @@ Full Body Essentials,Any,Full Body,Face Pulls,3,15,60,Target: Rear Delts/Shoulde
                 'Upper/Lower Split': 'This intermediate routine divides the body into two distinct types of sessions, allowing for a higher volume of work on specific muscle groups. By alternating between upper and lower body days, users can increase their training frequency and recovery potential.',
                 'Bodyweight Mastery': 'Focused entirely on calisthenics, this routine uses your own weight and gravity to develop functional strength, balance, and mobility. It is the ideal choice for users who prefer to work out at home or outdoors with little to no equipment.',
                 '30-Min Express': 'This fast-paced circuit is built for busy schedules, using high-intensity movements to improve cardiovascular health while toning muscle. It minimizes rest periods to keep the heart rate elevated, ensuring a complete workout in a short window of time.',
-                'Full Body Essentials': 'A balanced full-body routine targeting all major muscle groups with a mix of strength, core, and prehab exercises. Ideal for general fitness and hypertrophy.'
+                'Full Body Essentials': 'A balanced full-body routine targeting all major muscle groups with a mix of strength, core, and prehab exercises. Ideal for general fitness and hypertrophy.',
+                'Standardized Workout Plan': 'A comprehensive workout plan splitting sessions into upper and lower body focused days.'
             };
 
             return Object.keys(programMap).map((name) => ({
