@@ -42,6 +42,7 @@
             <div id="fuelDashboard">
             <div class="section">
                 <div class="section-title">Fuel</div>
+                <div class="helper-text" style="margin-bottom: 15px;">Protein 125–150 g. Bar is 140. Vegetarian (eggs, dairy, whey).</div>
                 <div style="display: flex; gap: 10px; margin-bottom: 15px;">
                     <button class="btn" id="addMealBtn" style="flex: 1; padding: 10px;">+ Add Meal</button>
                     <button class="btn btn-secondary" id="viewNutritionProgressBtn" style="flex: 1; padding: 10px;">Insights</button>
@@ -61,7 +62,7 @@
                     <div class="progress-container" style="margin-bottom: 10px;">
                         <div style="display: flex; justify-content: space-between; font-size: 0.85rem; margin-bottom: 5px;">
                             <span>Protein (g)</span>
-                            <span id="proProgressText">0 / 160</span>
+                            <span id="proProgressText">0 / 140</span>
                         </div>
                         <div style="background: var(--bg-card); height: 8px; border-radius: 4px; overflow: hidden; border: 1px solid var(--border);">
                             <div id="proProgressBar" style="background: var(--accent-primary); width: 0%; height: 100%; transition: width 0.3s; border-radius: 4px;"></div>
@@ -349,124 +350,42 @@
         let inactivityTimeout = null;
         const INACTIVITY_COMPLETE_MS = 25 * 60 * 1000;
         const PROGRAMS_CSV = `Program,Day,Type,Exercise,Sets,Reps,Rest,Notes,Suggested Weight,Demo Type,Demo URL,Demo Poster
-Standardized Workout Plan,Sunday,Upper A,Flat Dumbbell Bench Press,4,8,150,Per dumbbell; use neutral or semi-neutral grip if shoulders prefer it,35.0,link,https://www.youtube.com/results?search_query=flat+dumbbell+bench+press+exercise+form,
-Standardized Workout Plan,Sunday,Upper A,Pull Ups,4,5,150,Bodyweight; stop 1 rep before form breaks,,link,https://www.youtube.com/results?search_query=pull+ups+exercise+form,
-Standardized Workout Plan,Sunday,Upper A,Dips,3,8,120,Bodyweight; slight forward lean; stop before shoulder discomfort,,link,https://www.youtube.com/results?search_query=dips+exercise+form,
-Standardized Workout Plan,Sunday,Upper A,Chest Supported Dumbbell Row,4,10,90,Per dumbbell,40.0,link,https://www.youtube.com/results?search_query=chest+supported+dumbbell+row+exercise+form,
-Standardized Workout Plan,Sunday,Upper A,Face Pull,3,15,60,Controlled tempo,70.0,link,https://www.youtube.com/results?search_query=face+pull+exercise+form,
-Standardized Workout Plan,Sunday,Upper A,Cable Crunch,4,12,60,Hard contraction on each rep,80.0,link,https://www.youtube.com/results?search_query=cable+crunch+exercise+form,
-Standardized Workout Plan,Monday,Lower A,Goblet Squat,4,10,120,Use one dumbbell or kettlebell held at chest,45.0,link,https://www.youtube.com/results?search_query=goblet+squat+exercise+form,
-Standardized Workout Plan,Monday,Lower A,Bulgarian Split Squat,3,10 per leg,90,20 each hand,20.0,link,https://www.youtube.com/results?search_query=bulgarian+split+squat+exercise+form,
-Standardized Workout Plan,Monday,Lower A,Dumbbell Romanian Deadlift,3,10,120,Per dumbbell; soft knees and push hips back,35.0,link,https://www.youtube.com/results?search_query=dumbbell+romanian+deadlift+exercise+form,
-Standardized Workout Plan,Monday,Lower A,45 Degree Back Extension,3,12,90,Bodyweight; stop at straight line not hyperextension,,link,https://www.youtube.com/results?search_query=45+degree+back+extension+exercise+form,
-Standardized Workout Plan,Monday,Lower A,Side Plank,3,30 sec per side,45,Bodyweight,,link,https://www.youtube.com/results?search_query=side+plank+exercise+form,
-Standardized Workout Plan,Wednesday,Upper B,Dips,4,8,120,Bodyweight; slight forward lean,,link,https://www.youtube.com/results?search_query=dips+exercise+form,
-Standardized Workout Plan,Wednesday,Upper B,Pull Ups,5,4,150,Bodyweight,,link,https://www.youtube.com/results?search_query=pull+ups+exercise+form,
-Standardized Workout Plan,Wednesday,Upper B,Flat Dumbbell Bench Press,3,10,120,Per dumbbell; lighter volume day,30.0,link,https://www.youtube.com/results?search_query=flat+dumbbell+bench+press+exercise+form,
-Standardized Workout Plan,Wednesday,Upper B,One Arm Dumbbell Row,4,10 per side,90,Per side,45.0,link,https://www.youtube.com/results?search_query=one+arm+dumbbell+row+exercise+form,
-Standardized Workout Plan,Wednesday,Upper B,Seated Dumbbell Shoulder Press,3,8,120,Per dumbbell; keep conservative for shoulders,25.0,link,https://www.youtube.com/results?search_query=seated+dumbbell+shoulder+press+exercise+form,
-Standardized Workout Plan,Wednesday,Upper B,Preacher Curl Machine,3,10,60,,65.0,link,https://www.youtube.com/results?search_query=preacher+curl+machine+exercise+form,
-Standardized Workout Plan,Wednesday,Upper B,Face Pull,2,15,60,Controlled tempo,60.0,link,https://www.youtube.com/results?search_query=face+pull+exercise+form,
-Standardized Workout Plan,Friday,Lower B,Dumbbell Romanian Deadlift,4,8,120,Per dumbbell; controlled hinge,40.0,link,https://www.youtube.com/results?search_query=dumbbell+romanian+deadlift+exercise+form,
-Standardized Workout Plan,Friday,Lower B,Goblet Squat,3,8,120,Use one dumbbell or kettlebell held at chest,50.0,link,https://www.youtube.com/results?search_query=goblet+squat+exercise+form,
-Standardized Workout Plan,Friday,Lower B,Reverse Lunge,3,10 per leg,90,20 each hand,20.0,link,https://www.youtube.com/results?search_query=reverse+lunge+exercise+form,
-Standardized Workout Plan,Friday,Lower B,45 Degree Back Extension,3,12,90,Hold 10 lb plate to chest when bodyweight is easy,10.0,link,https://www.youtube.com/results?search_query=45+degree+back+extension+exercise+form,
-Standardized Workout Plan,Friday,Lower B,Cable Crunch,4,12,60,Hard contraction on each rep,80.0,link,https://www.youtube.com/results?search_query=cable+crunch+exercise+form,
-StrongLifts 5x5,Monday,Workout A,Barbell Squat,5,5,180,Add 5lbs each session,45
-StrongLifts 5x5,Monday,Workout A,Barbell Bench Press,5,5,180,Keep heels on floor,45
-StrongLifts 5x5,Monday,Workout A,Barbell Row,5,5,180,Pull to lower chest,45
-StrongLifts 5x5,Wednesday,Workout B,Barbell Squat,5,5,180,Add 5lbs each session,50
-StrongLifts 5x5,Wednesday,Workout B,Overhead Press,5,5,180,Strict form; no leg drive,45
-StrongLifts 5x5,Wednesday,Workout B,Deadlift,1,5,180,Add 10lbs each session,95
-StrongLifts 5x5,Friday,Workout A,Barbell Squat,5,5,180,Add 5lbs each session,55
-StrongLifts 5x5,Friday,Workout A,Barbell Bench Press,5,5,180,,50
-StrongLifts 5x5,Friday,Workout A,Barbell Row,5,5,180,,50
-3-Day Full Body,Monday,Full Body,Goblet Squats,3,10-12,90,Focus on depth,25
-3-Day Full Body,Monday,Full Body,Push-ups,3,AMRAP,60,As many reps as possible,
-3-Day Full Body,Monday,Full Body,Dumbbell Rows,3,10-12,60,,20
-3-Day Full Body,Wednesday,Full Body,Dumbbell Lunges,3,10,90,Reps per leg,15
-3-Day Full Body,Wednesday,Full Body,Dumbbell Shoulder Press,3,10-12,60,,20
-3-Day Full Body,Wednesday,Full Body,Lat Pulldowns,3,10-12,90,,70
-3-Day Full Body,Friday,Full Body,Romanian Deadlifts,3,12,90,Keep back flat,45
-3-Day Full Body,Friday,Full Body,Dumbbell Bench Press,3,10-12,90,,30
-3-Day Full Body,Friday,Full Body,Plank,3,45s,60,Focus on core tension,
-Upper/Lower Split,Monday,Upper Split,Bench Press,3,8-10,120,,95
-Upper/Lower Split,Monday,Upper Split,Seated Cable Row,3,10-12,90,,80
-Upper/Lower Split,Monday,Upper Split,Dumbbell Lateral Raise,3,12-15,60,,10
-Upper/Lower Split,Tuesday,Lower Split,Back Squat,3,8-10,120,,135
-Upper/Lower Split,Tuesday,Lower Split,Leg Curls,3,12-15,90,,60
-Upper/Lower Split,Tuesday,Lower Split,Calf Raises,4,15,60,,
-Upper/Lower Split,Thursday,Upper Split,Overhead Press,3,8-10,120,,65
-Upper/Lower Split,Thursday,Upper Split,Pull Ups,3,6-10,120,Assisted if needed,
-Upper/Lower Split,Thursday,Upper Split,Triceps Pushdown,3,12-15,60,,40
-Upper/Lower Split,Friday,Lower Split,Deadlift,3,5,180,,185
-Upper/Lower Split,Friday,Lower Split,Leg Press,3,10-12,90,,180
-Bodyweight Mastery,Monday,Calisthenics,Pull-ups,4,5-10,120,Use bands if needed,
-Bodyweight Mastery,Monday,Calisthenics,Dips,4,8-12,90,Focus on triceps,
-Bodyweight Mastery,Monday,Calisthenics,Bodyweight Squats,4,20,60,Fast tempo,
-Bodyweight Mastery,Wednesday,Calisthenics,Plank to Pushup,3,10,60,,
-Bodyweight Mastery,Wednesday,Calisthenics,Hollow Body Hold,3,30s,60,,
-Bodyweight Mastery,Wednesday,Calisthenics,Bird-Dog,3,12,30,Reps per side,
-Bodyweight Mastery,Friday,Calisthenics,Chin-ups,4,5-10,120,,
-Bodyweight Mastery,Friday,Calisthenics,Diamond Push-ups,4,10-15,90,,
-Bodyweight Mastery,Friday,Calisthenics,Bulgarian Split Squats,3,10,60,Reps per leg,
-30-Min Express,Any,Express Circuit,Kettlebell Swings,4,20,30,Minimal rest between moves,35
-30-Min Express,Any,Express Circuit,Dumbbell Thrusters,4,12,30,Squat into overhead press,20
-30-Min Express,Any,Express Circuit,Mountain Climbers,4,40,30,Fast pace,
-30-Min Express,Any,Express Circuit,Renegade Rows,4,10,30,Reps per arm,25
-30-Min Express,Any,Express Circuit,Burpees,4,10,60,Rest 60s after full round,
-Full Body Essentials,Any,Full Body,Goblet Squats,3,10-12,90,Target: Glutes/Quads,
-Full Body Essentials,Any,Full Body,Dips (Lean Forward),3,8-10,90,Target: Chest/Triceps,
-Full Body Essentials,Any,Full Body,Pull-ups,3,AMRAP,90,Target: Lats/Biceps,
-Full Body Essentials,Any,Full Body,Bulgarian Split Squats,2,10 (ea),90,Target: Glutes/Quads,
-Full Body Essentials,Any,Full Body,Hammer Curls,3,10-12,60,Target: Biceps,
-Full Body Essentials,Any,Full Body,Cable Crunches,3,12-15,60,Target: Upper Abs,
-Full Body Essentials,Any,Full Body,Dead Bugs,3,10 (ea side),60,Target: Deep Core,
-Full Body Essentials,Any,Full Body,Face Pulls,3,15,60,Target: Rear Delts/Shoulders,
-Rotator Cuff Rehab (Early Stage),Monday,Activation & Mobility,Pendulum Swings,2,10 (ea direction),30,Lean over support; let arm hang and swing gently — no muscle effort. Clear with PT first.,
-Rotator Cuff Rehab (Early Stage),Monday,Activation & Mobility,Scapular Squeezes,2,10,30,Pinch shoulder blades together; hold 3s. No shrugging.,
-Rotator Cuff Rehab (Early Stage),Monday,Activation & Mobility,Wall Slides,2,10,45,Forearms on wall; slide up only as high as pain-free range allows.,
-Rotator Cuff Rehab (Early Stage),Monday,Activation & Mobility,Banded External Rotation,2,12,45,Elbow tucked at side (towel under elbow); slow tempo. Lightest band.,Light band
-Rotator Cuff Rehab (Early Stage),Monday,Activation & Mobility,Isometric Shoulder Flexion,2,5 (hold 5s),30,Make a fist; press gently forward into a wall. No movement — just light tension.,
-Rotator Cuff Rehab (Early Stage),Wednesday,Stability,Pendulum Swings,2,10 (ea direction),30,Warmup. Relaxed swings only.,
-Rotator Cuff Rehab (Early Stage),Wednesday,Stability,Banded Scapular Retraction,2,12,45,Arms straight out front; pull band apart by squeezing shoulder blades.,Light band
-Rotator Cuff Rehab (Early Stage),Wednesday,Stability,Banded Internal Rotation,2,12,45,Elbow tucked at side; rotate hand toward stomach. Pain-free range only.,Light band
-Rotator Cuff Rehab (Early Stage),Wednesday,Stability,Side-Lying External Rotation,2,10,45,Lie on uninjured (right) side; elbow at 90° pinned to ribs. Start with no weight.,0-2 lb
-Rotator Cuff Rehab (Early Stage),Wednesday,Stability,Isometric Shoulder Abduction,2,5 (hold 5s),30,Stand next to wall; press outside of upper arm into wall. No movement.,
-Rotator Cuff Rehab (Early Stage),Friday,Light Strength,Pendulum Swings,2,10 (ea direction),30,Warmup. Relaxed swings only.,
-Rotator Cuff Rehab (Early Stage),Friday,Light Strength,Prone Y-T-W Raises,2,8 (ea shape),45,Lie face down on bench; raise arms in Y then T then W shapes. Bodyweight only — thumbs up.,
-Rotator Cuff Rehab (Early Stage),Friday,Light Strength,Banded External Rotation,3,12,45,Slow controlled tempo. Progress band tension only when pain-free.,Light band
-Rotator Cuff Rehab (Early Stage),Friday,Light Strength,Supported Band Row,2,12,60,Anchor band; row with elbow close to body. Do NOT shrug or hike shoulder.,Light band
-Rotator Cuff Rehab (Early Stage),Friday,Light Strength,Cross-Body Stretch,2,30s hold,30,Gently pull arm across chest with opposite hand. Stop at first pinch.,
-Rotator Cuff Recovery,Monday,Lower Body + Rehab,Pendulum Swings,2,30s,30,Lean over and let the arm hang; circle gently both ways,
-Rotator Cuff Recovery,Monday,Lower Body + Rehab,Band External Rotation,3,12-15,45,Elbow pinned to your side; rotate slow and pain-free,
-Rotator Cuff Recovery,Monday,Lower Body + Rehab,Band Internal Rotation,3,12-15,45,Elbow pinned to your side; controlled and pain-free,
-Rotator Cuff Recovery,Monday,Lower Body + Rehab,Leg Press,3,10-12,90,Push through the heels; full controlled range,
-Rotator Cuff Recovery,Monday,Lower Body + Rehab,Seated Leg Curl,3,12-15,75,Squeeze the hamstrings; no swinging,
-Rotator Cuff Recovery,Monday,Lower Body + Rehab,Leg Extension,3,12-15,60,Pause and squeeze the quads at the top,
-Rotator Cuff Recovery,Monday,Lower Body + Rehab,Standing Calf Raise,4,15,45,Full stretch at the bottom of each rep,
-Rotator Cuff Recovery,Monday,Lower Body + Rehab,Cross-Body Shoulder Stretch,2,30s (ea),30,Gently draw the arm across the chest; stop before pain,
-Rotator Cuff Recovery,Wednesday,Shoulder PT + Mobility,Pendulum Swings,2,30s,30,Relax the arm; small gentle circles each direction,
-Rotator Cuff Recovery,Wednesday,Shoulder PT + Mobility,Scapular Retraction,3,12,45,Squeeze shoulder blades back and down; hold 2s,
-Rotator Cuff Recovery,Wednesday,Shoulder PT + Mobility,Band External Rotation,3,15,45,The key rotator cuff move; slow and light,
-Rotator Cuff Recovery,Wednesday,Shoulder PT + Mobility,Wall Slides,3,10,45,Forearms on the wall; slide up only as high as pain-free,
-Rotator Cuff Recovery,Wednesday,Shoulder PT + Mobility,Doorway Pec Stretch,3,30s,30,Forearm on the frame; step through gently,
-Rotator Cuff Recovery,Wednesday,Shoulder PT + Mobility,Sleeper Stretch,2,30s,30,Lie on the sore side; ease the forearm down — no sharp pain,
-Rotator Cuff Recovery,Wednesday,Shoulder PT + Mobility,Upper Trap Stretch,2,30s (ea),30,Ear toward shoulder; light hand assist,
-Rotator Cuff Recovery,Wednesday,Shoulder PT + Mobility,Dead Bug,3,10 (ea side),45,Keep the low back flat; brace your core,
-Rotator Cuff Recovery,Friday,Lower Body + Light Upper,Band External Rotation,3,12-15,45,Warm up the cuff first; keep it pain-free,
-Rotator Cuff Recovery,Friday,Lower Body + Light Upper,Goblet Squat,3,10-12,90,Hold the weight at your chest; go light to spare the shoulder,
-Rotator Cuff Recovery,Friday,Lower Body + Light Upper,Barbell Hip Thrust,3,10-12,90,Bar rests on the hips; drive up and squeeze the glutes,
-Rotator Cuff Recovery,Friday,Lower Body + Light Upper,Walking Lunges,3,10 (ea),75,Light or bodyweight; tall chest and controlled,
-Rotator Cuff Recovery,Friday,Lower Body + Light Upper,Seated Cable Row,3,12-15,75,Light weight; squeeze shoulder blades — doubles as rehab,
-Rotator Cuff Recovery,Friday,Lower Body + Light Upper,Triceps Pushdown,3,12-15,60,Keep elbows pinned; the shoulder stays still,
-Rotator Cuff Recovery,Friday,Lower Body + Light Upper,Hammer Curl,3,12-15,60,Light and controlled; no swinging,
-Rotator Cuff Recovery,Friday,Lower Body + Light Upper,Cross-Body Shoulder Stretch,2,30s (ea),30,Ease the arm across the chest; gentle hold,`;
+Princeton MWF,Monday,Squat + Push,Band External Rotation,2,12 per side,45,"Elbow tucked, towel under elbow. Light band. Pain-free. Warmup.",,youtube,https://www.youtube.com/shorts/XUio2KS7NaI,
+Princeton MWF,Monday,Squat + Push,Face Pull,2,12,45,Warmup. Slow. No shrugging.,,youtube,https://www.youtube.com/shorts/7kXfVIwmfwE,
+Princeton MWF,Monday,Squat + Push,Leg Press,4,8-10,120,Last 2-3 hard. Stop before form breaks.,,youtube,https://www.youtube.com/shorts/EotSw18oR9w,
+Princeton MWF,Monday,Squat + Push,Goblet Squat,3,8-10,120,Swap for extra leg press if goblet bothers the left shoulder.,,youtube,https://www.youtube.com/shorts/8WUe1MNvN8Y,
+Princeton MWF,Monday,Squat + Push,Neutral Grip Dumbbell Bench Press,4,8-10,150,Per dumbbell. Neutral or semi-neutral. Swap: machine chest press or floor press if the shoulder talks.,,youtube,https://www.youtube.com/shorts/fZuQpjhaR_M,
+Princeton MWF,Monday,Squat + Push,Seated Cable Row,4,8-10,90,Squeeze blades. Do not hike the left shoulder.,,youtube,https://www.youtube.com/shorts/Ab6x-Awqc-Y,
+Princeton MWF,Monday,Squat + Push,Seated Leg Curl,3,10-12,75,,,youtube,https://www.youtube.com/shorts/xdbEG3xGLI8,
+Princeton MWF,Monday,Squat + Push,Cable Lateral Raise,3,12-15,60,Light. Stop at first pinch.,,youtube,https://www.youtube.com/shorts/HCfU6LGpgMk,
+Princeton MWF,Monday,Squat + Push,Triceps Pushdown,3,10-12,60,Elbows pinned. Shoulder stays still.,,youtube,https://www.youtube.com/shorts/1FjkhpZsaxc,
+Princeton MWF,Monday,Squat + Push,Dead Bug,3,8-12 per side,45,,,youtube,https://www.youtube.com/shorts/Aoipu_fl3HA,
+Princeton MWF,Wednesday,Hinge + Pull,Band External Rotation,2,12 per side,45,Warmup. Same as Monday.,,youtube,https://www.youtube.com/shorts/XUio2KS7NaI,
+Princeton MWF,Wednesday,Hinge + Pull,Face Pull,2,12,45,Warmup.,,youtube,https://www.youtube.com/shorts/7kXfVIwmfwE,
+Princeton MWF,Wednesday,Hinge + Pull,Barbell Hip Thrust,4,8-10,120,This is the hinge. Not RDL. Bar on hips.,,youtube,https://www.youtube.com/shorts/rneQGh3-72Q,
+Princeton MWF,Wednesday,Hinge + Pull,45 Degree Back Extension,3,10-12,90,Stop at a straight line. Not hyperextension. Swap if hip thrust is taken.,,youtube,https://www.youtube.com/shorts/VH4Bqn1FUhM,
+Princeton MWF,Wednesday,Hinge + Pull,Chest Supported Dumbbell Row,4,8-10,90,Per dumbbell. Chest on pad so the cuff cannot cheat.,,youtube,https://www.youtube.com/shorts/09wri23R4SU,
+Princeton MWF,Wednesday,Hinge + Pull,Neutral Grip Lat Pulldown,4,8-10,90,Swap: assisted pull-up same grip. No kipping.,,youtube,https://www.youtube.com/shorts/u7AiC02Jigs,
+Princeton MWF,Wednesday,Hinge + Pull,Reverse Lunge,3,8 per leg,90,Not Bulgarian. Swap: more hip thrust or leg press if ankles complain.,,youtube,https://www.youtube.com/shorts/XZ_GuM5y4N8,
+Princeton MWF,Wednesday,Hinge + Pull,Face Pull,3,12-15,60,Working sets after warmup.,,youtube,https://www.youtube.com/shorts/7kXfVIwmfwE,
+Princeton MWF,Wednesday,Hinge + Pull,Preacher Curl Machine,3,10-12,60,,,youtube,https://www.youtube.com/shorts/6vkt3oF57QY,
+Princeton MWF,Wednesday,Hinge + Pull,Side Plank,3,20-30s per side,45,,,youtube,https://www.youtube.com/shorts/vQ_tKTKF2cA,
+Princeton MWF,Friday,Single Leg + Mixed Upper,Band External Rotation,2,12 per side,45,Warmup.,,youtube,https://www.youtube.com/shorts/XUio2KS7NaI,
+Princeton MWF,Friday,Single Leg + Mixed Upper,Face Pull,2,12,45,Warmup.,,youtube,https://www.youtube.com/shorts/7kXfVIwmfwE,
+Princeton MWF,Friday,Single Leg + Mixed Upper,Hack Squat,4,8-10,120,Swap: belt squat or another leg-press pattern.,,youtube,https://www.youtube.com/shorts/g9i05umL5vc,
+Princeton MWF,Friday,Single Leg + Mixed Upper,Landmine Press,3,8-10,90,"Neutral-ish path. Swap: machine shoulder press if it stays quiet, or extra chest-supported row if the cuff is loud.",,youtube,https://www.youtube.com/shorts/7vhuahWr6Lc,
+Princeton MWF,Friday,Single Leg + Mixed Upper,One Arm Dumbbell Row,3,8-10 per side,90,Do not yank with the left shoulder.,,youtube,https://www.youtube.com/shorts/aFtWSOruuhs,
+Princeton MWF,Friday,Single Leg + Mixed Upper,Step Up,3,8 per leg,90,Not Bulgarian. Swap: walking lunge if ankles like it better.,,youtube,https://www.youtube.com/shorts/5ksu8nrdVIE,
+Princeton MWF,Friday,Single Leg + Mixed Upper,Machine Chest Fly,3,10-12,60,Slow. Mid-range. Stop before a stretch pinch.,,youtube,https://www.youtube.com/shorts/a9vQ_hwIksU,
+Princeton MWF,Friday,Single Leg + Mixed Upper,Farmer Carry,3,30-40s,60,Tall. Do not shrug.,,youtube,https://www.youtube.com/shorts/1uOs1hP3u4A,
+Princeton MWF,Friday,Single Leg + Mixed Upper,Hammer Curl,2,10-12,60,Optional if time. Light. No swing.,,youtube,https://www.youtube.com/shorts/NyW2fT2gQhM,
+Princeton MWF,Friday,Single Leg + Mixed Upper,Triceps Pushdown,2,10-12,60,Optional if time.,,youtube,https://www.youtube.com/shorts/1FjkhpZsaxc,`;
 
         // Initialize app
         function init() {
             loadFromStorage();
             loadBuiltInPrograms();
+            maybeLoadDefaultProgram();
             bindEventHandlers();
             updateStats();
             updatePlanHint();
@@ -700,13 +619,10 @@ Rotator Cuff Recovery,Friday,Lower Body + Light Upper,Cross-Body Shoulder Stretc
             'back squat': 'barbell back squat proper form',
             'bench press': 'barbell bench press proper form',
             'barbell bench press': 'barbell bench press proper form',
-            'overhead press': 'barbell overhead press proper form',
-            'shoulder press': 'dumbbell shoulder press proper form',
             'barbell row': 'barbell bent over row proper form',
             'dumbbell row': 'one arm dumbbell row proper form',
             'dumbbell rows': 'one arm dumbbell row proper form',
             'deadlift': 'conventional deadlift proper form',
-            'romanian deadlift': 'romanian deadlift proper form',
             'leg press': 'leg press proper form',
             'pull ups': 'strict pull up proper form',
             'pull-ups': 'strict pull up proper form',
@@ -714,14 +630,11 @@ Rotator Cuff Recovery,Friday,Lower Body + Light Upper,Cross-Body Shoulder Stretc
             'chin-ups': 'chin up proper form',
             'push ups': 'push up proper form',
             'push-ups': 'push up proper form',
-            'dips': 'parallel bar dips proper form',
             'lat pulldowns': 'lat pulldown proper form',
             'triceps pushdown': 'triceps cable pushdown proper form',
-            'bulgarian split squats': 'bulgarian split squat proper form',
             'goblet squats': 'goblet squat proper form',
             'kettlebell swings': 'kettlebell swing proper form',
-            'mountain climbers': 'mountain climber exercise form',
-            'burpees': 'burpee proper form'
+            'mountain climbers': 'mountain climber exercise form'
         };
 
         function clampNumber(value, min, max, fallback) {
@@ -1084,8 +997,9 @@ Rotator Cuff Recovery,Friday,Lower Body + Light Upper,Cross-Body Shoulder Stretc
             });
 
             const calTarget = 2100;
-            const proTarget = 160;
+            const proTarget = 140;
             const fibTarget = 30;
+            const proGreenAt = 125;
 
             const updateProgress = (idPrefix, current, target) => {
                 document.getElementById(`${idPrefix}ProgressText`).textContent = `${current} / ${target}`;
@@ -1098,8 +1012,11 @@ Rotator Cuff Recovery,Friday,Lower Body + Light Upper,Cross-Body Shoulder Stretc
                     if (current > target * 1.05) bar.style.backgroundColor = '#ff9500'; // Over
                     else if (current >= target * 0.95) bar.style.backgroundColor = '#4cd964'; // Perfect
                     else bar.style.backgroundColor = 'var(--accent)';
+                } else if (idPrefix === 'pro') {
+                    if (current >= proGreenAt) bar.style.backgroundColor = '#4cd964'; // Green at 125g; over 140 stays green
+                    else bar.style.backgroundColor = 'var(--accent)';
                 } else {
-                    if (current >= target) bar.style.backgroundColor = '#4cd964'; // Good to go over pro/fib
+                    if (current >= target) bar.style.backgroundColor = '#4cd964'; // Good to go over fiber
                     else bar.style.backgroundColor = 'var(--accent)';
                 }
             };
@@ -1391,6 +1308,14 @@ Rotator Cuff Recovery,Friday,Lower Body + Light Upper,Cross-Body Shoulder Stretc
             }
         }
 
+        function maybeLoadDefaultProgram() {
+            if (workoutPlan && Object.keys(workoutPlan).length > 0) return;
+            const defaultProgram = builtInPrograms.find((program) => program.name === 'Princeton MWF') || builtInPrograms[0];
+            if (!defaultProgram || !defaultProgram.plan) return;
+            workoutPlan = normalizePlan(defaultProgram.plan);
+            saveToStorage();
+        }
+
         function parseProgramsCsv(csvText) {
             const workbook = XLSX.read(csvText, {type: 'string'});
             const sheet = workbook.Sheets[workbook.SheetNames[0]];
@@ -1443,14 +1368,7 @@ Rotator Cuff Recovery,Friday,Lower Body + Light Upper,Cross-Body Shoulder Stretc
             }
 
             const descriptions = {
-                'StrongLifts 5x5': 'This program focuses on building pure strength through five fundamental compound barbell lifts performed for five sets of five reps. It utilizes a simple alternating \"A/B\" schedule that prioritizes consistent, heavy weight progression over time.',
-                '3-Day Full Body': 'Designed for overall fitness, this routine hits every major muscle group in a single session to maximize efficiency for beginners. It provides a balanced approach to strength and conditioning without requiring more than three days in the gym per week.',
-                'Upper/Lower Split': 'This intermediate routine divides the body into two distinct types of sessions, allowing for a higher volume of work on specific muscle groups. By alternating between upper and lower body days, users can increase their training frequency and recovery potential.',
-                'Bodyweight Mastery': 'Focused entirely on calisthenics, this routine uses your own weight and gravity to develop functional strength, balance, and mobility. It is the ideal choice for users who prefer to work out at home or outdoors with little to no equipment.',
-                '30-Min Express': 'This fast-paced circuit is built for busy schedules, using high-intensity movements to improve cardiovascular health while toning muscle. It minimizes rest periods to keep the heart rate elevated, ensuring a complete workout in a short window of time.',
-                'Full Body Essentials': 'A balanced full-body routine targeting all major muscle groups with a mix of strength, core, and prehab exercises. Ideal for general fitness and hypertrophy.',
-                'Standardized Workout Plan': 'A comprehensive workout plan splitting sessions into upper and lower body focused days.',
-                'Rotator Cuff Recovery': 'Built for training around a healing rotator cuff. It keeps the lower body progressing with joint-friendly machine and bodyweight leg work and adds only light shoulder-safe upper-body movements. Every session also includes dedicated rotator cuff physical therapy and stretching. Train pain-free and follow the guidance of your physical therapist or doctor.'
+                'Princeton MWF': 'Monday squat + push, Wednesday hinge + pull, Friday single-leg + mixed upper. Suggested weights stay blank — log what you use.'
             };
 
             return Object.keys(programMap).map((name) => ({
@@ -1789,7 +1707,7 @@ Rotator Cuff Recovery,Friday,Lower Body + Light Upper,Cross-Body Shoulder Stretc
             if (['youtube', 'video', 'image', 'gif', 'link'].includes(normalizedType)) return normalizedType;
 
             const normalizedUrl = (url || '').toLowerCase().split('?')[0];
-            if (isYouTubeUrl(url || '')) return 'youtube';
+            if (normalizedUrl.includes('/shorts/') || isYouTubeUrl(url || '')) return 'youtube';
             if (/\.(mp4|webm|mov|m4v)$/.test(normalizedUrl)) return 'video';
             if (/\.(gif)$/.test(normalizedUrl)) return 'gif';
             if (/\.(png|jpe?g|webp|avif|svg)$/.test(normalizedUrl)) return 'image';
@@ -1830,6 +1748,11 @@ Rotator Cuff Recovery,Friday,Lower Body + Light Upper,Cross-Body Shoulder Stretc
                     if (path === '/results') {
                         const query = parsed.searchParams.get('search_query');
                         if (query) return `https://www.youtube.com/results?search_query=${encodeURIComponent(query)}`;
+                    }
+
+                    if (path.startsWith('/shorts/')) {
+                        const videoId = path.split('/').filter(Boolean)[1];
+                        if (videoId) return `https://www.youtube.com/shorts/${videoId}`;
                     }
                 }
 
