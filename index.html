@@ -351,18 +351,18 @@
         const INACTIVITY_COMPLETE_MS = 25 * 60 * 1000;
         const PROGRAMS_CSV = `Program,Day,Type,Exercise,Sets,Reps,Rest,Notes,Suggested Weight,Demo Type,Demo URL,Demo Poster
 Princeton MWF,Monday,Squat + Push,Band External Rotation,2,12 per side,45,Warmup. Elbow tucked. Light band. Pain-free.,,youtube,https://www.youtube.com/results?search_query=banded+external+rotation+exercise+form,
-Princeton MWF,Monday,Squat + Push,Leg Press,5,6-8,180,Main squat. Last 2-3 hard. 1-2 in the tank.,,youtube,https://www.youtube.com/results?search_query=leg+press+exercise+form,
-Princeton MWF,Monday,Squat + Push,Neutral Grip Dumbbell Bench Press,4,6-8,150,Per dumbbell. Neutral grip. Swap: machine chest press or floor press.,,youtube,https://www.youtube.com/results?search_query=neutral+grip+dumbbell+bench+press+exercise+form,
-Princeton MWF,Monday,Squat + Push,Seated Cable Row,4,6-8,120,The row for this day. Do not hike the left shoulder.,,youtube,https://www.youtube.com/results?search_query=seated+cable+row+exercise+form,
-Princeton MWF,Monday,Squat + Push,Triceps Pushdown,3,8-10,75,Elbows pinned. Shoulder stays still.,,youtube,https://www.youtube.com/results?search_query=triceps+cable+pushdown+exercise+form,
+Princeton MWF,Monday,Squat + Push,Leg Press,5,"6-8",180,Main squat. Last 2-3 hard. 1-2 in the tank.,,youtube,https://www.youtube.com/results?search_query=leg+press+exercise+form,
+Princeton MWF,Monday,Squat + Push,Neutral Grip Dumbbell Bench Press,4,"6-8",150,Per dumbbell. Neutral grip. Swap: machine chest press or floor press.,,youtube,https://www.youtube.com/results?search_query=neutral+grip+dumbbell+bench+press+exercise+form,
+Princeton MWF,Monday,Squat + Push,Seated Cable Row,4,"6-8",120,The row for this day. Do not hike the left shoulder.,,youtube,https://www.youtube.com/results?search_query=seated+cable+row+exercise+form,
+Princeton MWF,Monday,Squat + Push,Triceps Pushdown,3,"8-10",75,Elbows pinned. Shoulder stays still.,,youtube,https://www.youtube.com/results?search_query=triceps+cable+pushdown+exercise+form,
 Princeton MWF,Wednesday,Hinge + Pull,Band External Rotation,2,12 per side,45,Warmup. Same as Monday.,,youtube,https://www.youtube.com/results?search_query=banded+external+rotation+exercise+form,
-Princeton MWF,Wednesday,Hinge + Pull,Barbell Hip Thrust,5,6-8,180,This is the hinge. Not RDL. Last 2-3 hard.,,youtube,https://www.youtube.com/results?search_query=barbell+hip+thrust+exercise+form,
-Princeton MWF,Wednesday,Hinge + Pull,Chest Supported Dumbbell Row,4,6-8,120,The row for this day. Chest on pad.,,youtube,https://www.youtube.com/results?search_query=chest+supported+dumbbell+row+exercise+form,
-Princeton MWF,Wednesday,Hinge + Pull,Neutral Grip Lat Pulldown,4,6-8,120,Swap: assisted pull-up same grip. No kipping.,,youtube,https://www.youtube.com/results?search_query=neutral+grip+lat+pulldown+exercise+form,
-Princeton MWF,Wednesday,Hinge + Pull,Face Pull,3,12-15,60,Only face-pull day. Slow. No shrugging.,,youtube,https://www.youtube.com/results?search_query=face+pull+exercise+form,
+Princeton MWF,Wednesday,Hinge + Pull,Barbell Hip Thrust,5,"6-8",180,This is the hinge. Not RDL. Last 2-3 hard.,,youtube,https://www.youtube.com/results?search_query=barbell+hip+thrust+exercise+form,
+Princeton MWF,Wednesday,Hinge + Pull,Chest Supported Dumbbell Row,4,"6-8",120,The row for this day. Chest on pad.,,youtube,https://www.youtube.com/results?search_query=chest+supported+dumbbell+row+exercise+form,
+Princeton MWF,Wednesday,Hinge + Pull,Neutral Grip Lat Pulldown,4,"6-8",120,Swap: assisted pull-up same grip. No kipping.,,youtube,https://www.youtube.com/results?search_query=neutral+grip+lat+pulldown+exercise+form,
+Princeton MWF,Wednesday,Hinge + Pull,Face Pull,3,"12-15",60,Only face-pull day. Slow. No shrugging.,,youtube,https://www.youtube.com/results?search_query=face+pull+exercise+form,
 Princeton MWF,Friday,Single Leg + Mixed Upper,Band External Rotation,2,12 per side,45,Warmup.,,youtube,https://www.youtube.com/results?search_query=banded+external+rotation+exercise+form,
-Princeton MWF,Friday,Single Leg + Mixed Upper,Hack Squat,5,6-8,180,Swap: belt squat or another leg-press pattern.,,youtube,https://www.youtube.com/results?search_query=hack+squat+exercise+form,
-Princeton MWF,Friday,Single Leg + Mixed Upper,Landmine Press,4,6-8,120,"Neutral-ish path. Swap: machine press if quiet, extra row if cuff is loud.",,youtube,https://www.youtube.com/results?search_query=landmine+press+exercise+form,
+Princeton MWF,Friday,Single Leg + Mixed Upper,Hack Squat,5,"6-8",180,Swap: belt squat or another leg-press pattern.,,youtube,https://www.youtube.com/results?search_query=hack+squat+exercise+form,
+Princeton MWF,Friday,Single Leg + Mixed Upper,Landmine Press,4,"6-8",120,"Neutral-ish path. Swap: machine press if quiet, extra row if cuff is loud.",,youtube,https://www.youtube.com/results?search_query=landmine+press+exercise+form,
 Princeton MWF,Friday,Single Leg + Mixed Upper,Reverse Lunge,3,6 per leg,120,The single-leg. Not Bulgarian. Swap: more hack or leg press if ankles complain.,,youtube,https://www.youtube.com/results?search_query=reverse+lunge+exercise+form,
 Princeton MWF,Friday,Single Leg + Mixed Upper,Farmer Carry,3,40s,75,"Tall. Do not shrug. Hard walk, not a stroll.",,youtube,https://www.youtube.com/results?search_query=farmer+carry+exercise+form,`;
 
@@ -720,9 +720,10 @@ Princeton MWF,Friday,Single Leg + Mixed Upper,Farmer Carry,3,40s,75,"Tall. Do no
             const reader = new FileReader();
             reader.onload = function(e) {
                 try {
+                    // raw:true keeps hyphenated reps like 6-8 as text (SheetJS otherwise date-parses them)
                     const workbook = isCsv
-                        ? XLSX.read(e.target.result, {type: 'string'})
-                        : XLSX.read(new Uint8Array(e.target.result), {type: 'array'});
+                        ? XLSX.read(e.target.result, {type: 'string', raw: true})
+                        : XLSX.read(new Uint8Array(e.target.result), {type: 'array', raw: true});
                     parseWorkoutPlan(workbook);
                     alert('Workout plan imported successfully!');
                     showHome();
@@ -740,7 +741,7 @@ Princeton MWF,Friday,Single Leg + Mixed Upper,Farmer Carry,3,40s,75,"Tall. Do no
 
         function parseWorkoutPlan(workbook) {
             const sheet = workbook.Sheets[workbook.SheetNames[0]];
-            const rows = XLSX.utils.sheet_to_json(sheet, {header: 1});
+            const rows = XLSX.utils.sheet_to_json(sheet, {header: 1, raw: true});
             
             workoutPlan = Object.create(null);
             let currentDay = null;
@@ -1302,9 +1303,10 @@ Princeton MWF,Friday,Single Leg + Mixed Upper,Farmer Carry,3,40s,75,"Tall. Do no
         }
 
         function parseProgramsCsv(csvText) {
-            const workbook = XLSX.read(csvText, {type: 'string'});
+            // raw:true keeps hyphenated reps like 6-8 as text (SheetJS otherwise date-parses them)
+            const workbook = XLSX.read(csvText, {type: 'string', raw: true});
             const sheet = workbook.Sheets[workbook.SheetNames[0]];
-            const rows = XLSX.utils.sheet_to_json(sheet, {header: 1});
+            const rows = XLSX.utils.sheet_to_json(sheet, {header: 1, raw: true});
             const header = rows[0] || [];
             const map = getHeaderMap(header);
             const programIndex = header.findIndex((cell) => cell && cell.toString().trim().toLowerCase() === 'program');
